@@ -4,14 +4,14 @@
   "title": "Open Workflow Framework Workflow",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "version", "purpose"],
+  "required": ["id", "name", "version", "description"],
   "properties": {
     "id": {"type": "string", "pattern": "^(OWF-[0-9]{3}|AIPUBS-[A-Z0-9]+-[0-9]{3})$"},
     "name": {"type": "string", "minLength": 1},
     "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "purpose": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
     "objective": {"type": "string", "minLength": 1},
-    "description": {"type": "string"},
     "type": {"type": "string", "enum": ["atomic", "composite", "curriculum"], "default": "atomic"},
     "category": {"type": "string"},
     "level": {"type": "string"},
@@ -22,12 +22,43 @@
       "type": "array",
       "items": {
         "oneOf": [
-          {"type": "string"},
-          {"type": "object", "minProperties": 1, "maxProperties": 1}
+          {"type": "string", "minLength": 1},
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type", "required", "description"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "type": {"type": "string", "minLength": 1},
+              "required": {"type": "boolean"},
+              "description": {"type": "string", "minLength": 1},
+              "validation": {"type": "object"},
+              "sensitivity": {"type": "string", "enum": ["public", "internal", "sensitive", "secret"]}
+            }
+          }
         ]
       }
     },
-    "outputs": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"type": "object", "minProperties": 1, "maxProperties": 1}]}},
+    "outputs": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"type": "string", "minLength": 1},
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "type": {"type": "string", "minLength": 1},
+              "schema": {"type": "string", "minLength": 1},
+              "deterministic": {"type": "boolean"},
+              "verification_status": {"enum": ["verified", "unverified", "unknown"]}
+            }
+          }
+        ]
+      }
+    },
     "capabilities": {"type": "object", "additionalProperties": {"type": "boolean"}},
     "steps": {
       "type": "array",
@@ -68,11 +99,11 @@
       "items": {
         "type": "object",
         "required": ["from", "to", "artifact"],
-        "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "artifact": {"type": "string"}},
+        "properties": {"from": {"type": "string", "minLength": 1}, "to": {"type": "string", "minLength": 1}, "artifact": {"type": "string", "minLength": 1}},
         "additionalProperties": false
       }
     },
-    "gates": {"type": "array", "items": {"oneOf": [{"type": "string"}, {"$ref": "#/$defs/gate"}]}},
+    "gates": {"type": "array", "items": {"oneOf": [{"type": "string", "minLength": 1}, {"$ref": "#/$defs/gate"}]}},
     "safety": {"type": "object", "additionalProperties": true},
     "verification": {"type": "array", "items": {"type": "string"}},
     "agents": {"type": "array", "items": {"type": "string"}},
@@ -86,6 +117,10 @@
     "mermaid": {"type": "string"},
     "copilot_plan": {"type": "string"}
   },
+  "oneOf": [
+    {"required": ["mode"], "not": {"required": ["modes"]}},
+    {"required": ["modes"], "not": {"required": ["mode"]}}
+  ],
   "allOf": [
     {
       "if": {"properties": {"type": {"const": "composite"}}, "required": ["type"]},
