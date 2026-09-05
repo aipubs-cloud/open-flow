@@ -1,0 +1,41 @@
+id: AIPUBS-START-010
+name: Complete Your First Open-Source Contribution
+version: 0.1.0
+category: start
+level: beginner
+mode: assisted
+objective: Guide a new GitHub user through a complete contribution to an open-source project.
+inputs:
+  - contributor-goal
+outputs:
+  - open-source-contribution
+  - contributor-journey
+  - graduation-badge
+steps:
+  - find_project
+  - explore_repository
+  - find_beginner_issue
+  - inspect_contribution_guidance
+  - discuss_if_needed
+  - clone_or_fork
+  - create_branch
+  - implement
+  - test
+  - commit
+  - open_pull_request
+  - respond_to_review
+  - verify_merge
+graduation:
+  - issue_selected
+  - change_submitted
+  - pull_request_created
+  - contribution_completed
+prerequisites:
+  - AIPUBS-START-003
+  - AIPUBS-GIT-002
+  - AIPUBS-GITHUB-002
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  requires_confirmation_before_modification: true

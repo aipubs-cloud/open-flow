@@ -1,0 +1,26 @@
+id: AIPUBS-MENTOR-001
+name: Ask AI to Explain Your Code
+version: 0.1.0
+category: mentor
+level: beginner
+mode: observe
+objective: Turn any selected file or function into a concise, evidence-based learning lesson.
+inputs:
+  - code-target
+outputs:
+  - code-explanation
+  - learning-exercise
+steps:
+  - identify_target
+  - explain_purpose
+  - explain_inputs_outputs
+  - explain_dependencies
+  - identify_potential_problems
+  - provide_example
+  - create_practice_exercise
+graduation:
+  - explanation_created
+  - exercise_created
+safety:
+  destructive_operations: false
+  modifies_files: false

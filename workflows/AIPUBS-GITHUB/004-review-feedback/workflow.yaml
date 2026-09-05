@@ -1,0 +1,30 @@
+id: AIPUBS-GITHUB-004
+name: Respond to Review Feedback
+version: 0.1.0
+category: github
+level: beginner
+mode: assisted
+objective: Teach the review-feedback loop from understanding a comment through updating, testing, and responding.
+inputs:
+  - review-feedback
+outputs:
+  - review-update
+  - reviewer-response
+steps:
+  - read_review_comment
+  - clarify_if_needed
+  - modify_code
+  - run_tests
+  - push_update
+  - respond_to_feedback
+graduation:
+  - feedback_understood
+  - update_verified
+  - response_posted
+prerequisites:
+  - AIPUBS-GITHUB-002
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  requires_confirmation_before_modification: true

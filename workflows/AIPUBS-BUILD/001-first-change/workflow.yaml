@@ -1,0 +1,33 @@
+id: AIPUBS-BUILD-001
+name: Build Your First Change
+version: 0.1.0
+category: build
+level: beginner
+mode: assisted
+objective: Guide a user from a GitHub Issue through understanding, planning, implementation, and verification.
+inputs:
+  - github-issue
+  - repository-map
+outputs:
+  - implemented-change
+  - implementation-evidence
+steps:
+  - understand_issue
+  - inspect_repository
+  - create_plan
+  - create_branch
+  - implement_change
+  - run_tests
+  - summarize_change
+graduation:
+  - issue_understood
+  - implementation_committed
+  - verification_recorded
+prerequisites:
+  - AIPUBS-GITHUB-001
+  - AIPUBS-START-003
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  requires_confirmation_before_modification: true

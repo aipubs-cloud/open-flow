@@ -1,0 +1,30 @@
+id: AIPUBS-GIT-002
+name: Your First Branch
+version: 0.1.0
+category: git
+level: beginner
+mode: guided
+objective: Teach why branches isolate proposed work and guide the user through a safe first branch.
+inputs:
+  - git-change
+outputs:
+  - feature-branch
+  - branch-commit
+steps:
+  - explain_branch_purpose
+  - create_feature_branch
+  - make_safe_change
+  - inspect_diff
+  - commit_branch_change
+  - compare_with_main
+graduation:
+  - feature_branch_created
+  - branch_change_committed
+  - main_unchanged
+prerequisites:
+  - AIPUBS-GIT-001
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  requires_confirmation_before_modification: true

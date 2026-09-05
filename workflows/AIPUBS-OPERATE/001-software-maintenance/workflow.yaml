@@ -1,0 +1,27 @@
+id: AIPUBS-OPERATE-001
+name: What Happens After Deployment?
+version: 0.1.0
+category: operate
+level: beginner
+mode: observe
+objective: Teach that software operation continues after deployment through monitoring, security, maintenance, and iteration.
+inputs:
+  - deployment-record
+outputs:
+  - operations-map
+  - maintenance-plan
+steps:
+  - inspect_runtime_signals
+  - inspect_dependencies
+  - inspect_security_alerts
+  - identify_logs_and_monitoring
+  - identify_maintenance_tasks
+  - create_maintenance_plan
+graduation:
+  - operations_concepts_introduced
+  - maintenance_plan_created
+prerequisites:
+  - AIPUBS-DEPLOY-001
+safety:
+  destructive_operations: false
+  modifies_files: false

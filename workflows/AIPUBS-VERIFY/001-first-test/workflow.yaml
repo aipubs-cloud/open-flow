@@ -1,0 +1,28 @@
+id: AIPUBS-VERIFY-001
+name: Does My Code Actually Work?
+version: 0.1.0
+category: verify
+level: beginner
+mode: assisted
+objective: Discover existing test infrastructure and teach verification through a real test run.
+inputs:
+  - implemented-change
+outputs:
+  - test-results
+  - verification-report
+steps:
+  - discover_test_runner
+  - inspect_existing_tests
+  - run_relevant_tests
+  - classify_failures
+  - summarize_verification
+graduation:
+  - test_runner_identified
+  - tests_executed
+  - result_recorded
+prerequisites:
+  - AIPUBS-BUILD-001
+safety:
+  destructive_operations: false
+  modifies_files: false
+  executes_tests: true

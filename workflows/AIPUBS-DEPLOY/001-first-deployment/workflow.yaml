@@ -1,0 +1,31 @@
+id: AIPUBS-DEPLOY-001
+name: Deploy Your First Website
+version: 0.1.0
+category: deploy
+level: beginner
+mode: assisted
+objective: Discover the repository's actual deployment path and guide the user from verified source to a live deployment.
+inputs:
+  - merged-change
+  - ci-map
+outputs:
+  - deployment-record
+  - live-endpoint
+steps:
+  - detect_deployment_platform
+  - inspect_deployment_configuration
+  - verify_build
+  - request_deployment_approval
+  - deploy
+  - verify_live_endpoint
+graduation:
+  - deployment_path_identified
+  - deployment_verified
+prerequisites:
+  - AIPUBS-GITHUB-005
+  - AIPUBS-VERIFY-002
+safety:
+  destructive_operations: false
+  modifies_files: false
+  deploys_external_system: true
+  requires_confirmation_before_external_write: true

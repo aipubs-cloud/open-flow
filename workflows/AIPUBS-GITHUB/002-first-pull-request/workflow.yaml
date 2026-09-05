@@ -1,0 +1,33 @@
+id: AIPUBS-GITHUB-002
+name: Your First Pull Request
+version: 0.1.0
+category: github
+level: beginner
+mode: assisted
+objective: Teach a user to inspect, test, document, and submit a real pull request.
+inputs:
+  - implemented-change
+  - branch-commit
+outputs:
+  - pull-request
+  - pull-request-description
+steps:
+  - inspect_diff
+  - self_review
+  - run_tests
+  - write_pr_description
+  - create_pull_request
+  - verify_pr_state
+graduation:
+  - diff_inspected
+  - tests_verified
+  - pull_request_created
+prerequisites:
+  - AIPUBS-GIT-002
+  - AIPUBS-BUILD-001
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: false
+  creates_pull_request: true
+  requires_confirmation_before_external_write: true

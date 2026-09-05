@@ -1,0 +1,33 @@
+id: AIPUBS-RELEASE-001
+name: Ship Your First Release
+version: 0.1.0
+category: release
+level: beginner
+mode: guided
+objective: Teach the complete release loop from verified change to version, changelog, tag, and release.
+inputs:
+  - merged-change
+  - test-results
+outputs:
+  - release-artifact
+  - release-notes
+steps:
+  - verify_release_scope
+  - select_version
+  - update_changelog
+  - create_tag
+  - create_release
+  - verify_release
+graduation:
+  - version_selected
+  - release_notes_present
+  - release_created
+prerequisites:
+  - AIPUBS-GITHUB-005
+  - AIPUBS-VERIFY-001
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  creates_release: true
+  requires_confirmation_before_modification: true
