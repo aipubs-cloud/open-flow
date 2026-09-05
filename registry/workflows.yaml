@@ -12,7 +12,7 @@ registry:
 
 workflows:
   - {id: OWF-001, name: First Contact, path: workflows/001-first-contact/workflow.yaml, version: 0.1.0, category: core, status: active}
-  - {id: OWF-002, name: Repository Explorer, path: workflows/002-repository-explorer/workflow.yaml, version: 0.1.0, category: core, status: active}
+  - {id: OWF-002, name: Repository Explorer, path: workflows/002-repository-explorer/workflow.yaml, version: 0.1.1, category: EXPLORER, status: active}
   - {id: OWF-003, name: Project Doctor, path: workflows/003-project-doctor/workflow.yaml, version: 0.1.0, category: core, status: active}
   - {id: OWF-004, name: Guided Bug Fix, path: workflows/004-guided-bug-fix/workflow.yaml, version: 0.1.0, category: core, status: active}
   - {id: OWF-005, name: Test Builder, path: workflows/005-test-builder/workflow.yaml, version: 0.1.0, category: core, status: active}
