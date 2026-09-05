@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aipubs-cloud/open-flow/blob/main/schemas/agent.schema.json",
+  "title": "OWF Agent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "role", "safety"],
+  "properties": {
+    "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "description": {"type": "string", "minLength": 1},
+    "role": {"type": "string", "minLength": 1},
+    "version": {"type": "string"},
+    "inputs": {"type": "array", "items": {"type": "string"}},
+    "outputs": {"type": "array", "items": {"type": "string"}},
+    "capabilities": {"type": "array", "items": {"type": "string"}},
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only_initially", "secret_policy"],
+      "properties": {
+        "read_only_initially": {"type": "boolean"},
+        "secret_policy": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
