@@ -3,6 +3,11 @@ name: Security Auditor
 version: 0.1.0
 purpose: Perform an evidence-driven repository security audit.
 mode: observe
+inputs:
+  - repository-map
+  - architecture-map
+  - health-report
+  - prioritized-actions
 steps:
   - id: inventory
     action: repository-discovery
