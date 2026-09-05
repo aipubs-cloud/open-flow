@@ -1,8 +1,3 @@
-[build-system]
-requires = []
-build-backend = "backend"
-backend-path = ["build_backend"]
-
 [project]
 name = "open-flow-owf002"
 version = "0.1.0"
