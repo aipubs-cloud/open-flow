@@ -9,7 +9,6 @@ dependencies = [
 
 [project.scripts]
 owf002-explore = "owf002.repo_explorer:main"
-owf-compose = "core.composer:main"
 
 [project.optional-dependencies]
 test = [
