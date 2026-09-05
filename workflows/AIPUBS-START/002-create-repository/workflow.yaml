@@ -1,28 +1,108 @@
 id: AIPUBS-START-002
 name: Create Your First Repository
-version: 0.1.0
+version: 0.1.1
 category: start
 level: beginner
 mode: guided
-objective: Guide a beginner through creating a useful GitHub repository with project documentation and baseline metadata.
+spec: OWF-001
+provider: aipubs
+license: MIT
+purpose: >
+  Transform a learner's project idea into a verified GitHub repository while
+  teaching repository naming, visibility, README, license, and .gitignore.
+safety:
+  modifies_remote: true
+  modifies_local_files: false
+  destructive_operations: false
+  overwrite_existing_repository: false
+  delete_operations: false
+  force_push: false
+  secret_exposure: false
+  credential_requests: false
+  require_confirmation_for_write: true
+  require_preflight: true
+pedagogy:
+  level: absolute_beginner
+  learning_loop:
+    - ORIENT
+    - DEFINE
+    - EXPLAIN
+    - PREVIEW
+    - CONFIRM
+    - CREATE
+    - VERIFY
+    - REFLECT
+    - HAND_OFF
+  epistemic_tags:
+    - OBSERVED_FACT
+    - INFERENCE
+    - UNKNOWN
 inputs:
   - project_goal
+  - repository_name
+  - visibility
+  - owner
+  - license
+  - ecosystem
+  - description
+  - initialize_readme
+  - gitignore_template
 outputs:
   - repository-created
   - repository-baseline
+  - repository-evidence
+  - concept-check
+  - next-workflow
 steps:
-  - choose_project_name
-  - choose_visibility
-  - create_repository
-  - establish_readme
-  - establish_license
-  - establish_gitignore
+  - id: define
+    action: capture
+    description: Capture the learner's project goal and minimum repository choices.
+  - id: name
+    action: validate
+    description: Validate repository naming and check for an existing target when supported.
+  - id: explain
+    action: teach
+    description: Explain visibility, README, license, and .gitignore before creation.
+  - id: preflight
+    action: preview
+    description: Render the complete repository creation plan before any remote write.
+  - id: confirm
+    action: confirm
+    description: Require explicit learner confirmation immediately before creation.
+  - id: create
+    action: execute
+    description: Invoke the approved GitHub repository-creation capability; stop safely if unavailable.
+  - id: verify
+    action: inspect
+    description: Verify the returned repository state using read-only observations.
+  - id: concepts
+    action: teach_and_check
+    description: Check the learner's understanding of purpose, visibility, README, license, and .gitignore.
+  - id: route
+    action: recommend
+    description: Select exactly one next workflow only when repository state is verified.
 graduation:
-  - repository_exists
-  - readme_present
-  - baseline_metadata_present
-safety:
-  destructive_operations: false
-  force_push: false
-  modifies_files: true
-  requires_confirmation_before_modification: true
+  - repository_created_or_supported_equivalent_reached
+  - owner_verified
+  - name_verified
+  - visibility_verified
+  - selected_metadata_verified
+  - concept_check_completed
+  - machine_readable_result_emitted
+completion_policy:
+  evidence_required: true
+  ai_self_attestation_allowed: false
+  repository_write_required: true
+  exactly_one_next_workflow: true
+  cancellation_is_failure: true
+routing:
+  created_and_explore: AIPUBS-START-003
+  created_and_learn_git: AIPUBS-GIT-001
+  created_and_track_work: AIPUBS-GITHUB-001
+  created_and_build: AIPUBS-BUILD-001
+  open_source: AIPUBS-START-010
+  blocked_or_cancelled: none
+composition:
+  prior_orientation: AIPUBS-START-001
+  repository_discovery: OWF-002
+  future_orchestrator: OWF-011

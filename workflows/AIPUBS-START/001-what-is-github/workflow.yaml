@@ -1,102 +1,29 @@
 id: AIPUBS-START-001
-name: "What Is GitHub?"
-version: 0.1.1
+name: What Is GitHub?
+version: 0.1.0
 category: start
 level: beginner
 mode: guided
-spec: OWF-001
-provider: aipubs
-license: MIT
-purpose: >
-  Transform a beginner's first question about GitHub into an interactive,
-  evidence-grounded orientation using the learner's real project context.
-safety:
-  modifies_files: false
-  executes_commands: true
-  allowed_commands:
-    - "git status"
-    - "git remote -v"
-    - "git branch --show-current"
-    - "git log -1 --oneline"
-  destructive_operations: false
-  force_push: false
-  delete_operations: false
-  reset_operations: false
-  secret_exposure: false
-  credential_requests: false
-  require_confirmation_for_write: true
-pedagogy:
-  level: absolute_beginner
-  time_estimate_minutes: 15
-  learning_loop:
-    - ORIENT
-    - ASK
-    - OBSERVE
-    - EXPLAIN
-    - MAP
-    - CHECK_UNDERSTANDING
-    - RECOMMEND_NEXT_ACTION
-    - HAND_OFF
-  epistemic_tags:
-    - OBSERVED_FACT
-    - INFERENCE
-    - UNKNOWN
+objective: Build a practical mental model of Git, GitHub, repositories, collaboration, and the software lifecycle.
 inputs:
   - user_goal
-  - repository_path
 outputs:
-  - user_intent
   - github-understanding
   - sdlc-position
-  - repository-evidence
-  - personal-github-map
-  - concept-check
   - next-workflow
 steps:
-  - id: orient
-    action: ask
-    description: Capture the learner's goal without requiring GitHub vocabulary.
-  - id: lifecycle
-    action: explain
-    description: Teach PLAN -> CREATE -> REVIEW -> TEST -> DEPLOY -> OPERATE -> LEARN.
-  - id: git-vs-github
-    action: teach_and_check
-    description: Explain Git and GitHub and verify the learner's distinction.
-  - id: observe
-    action: inspect
-    description: Perform read-only repository observation when a workspace is available.
-  - id: map
-    action: synthesize
-    description: Build a project-grounded evidence map using facts, inferences, and unknowns.
-  - id: concepts
-    action: teach_and_check
-    description: Explain repository, commit, branch, Issue, Pull Request, testing, Actions, deployment, and maintenance.
-  - id: route
-    action: recommend
-    description: Select exactly one next workflow based on learner intent and observed state.
+  - ask_project_goal
+  - explain_git_vs_github
+  - inspect_environment
+  - identify_repository
+  - locate_user_in_sdlc
+  - recommend_next_workflow
 graduation:
-  - user_intent_captured
-  - git_vs_github_understood
-  - core_github_primitives_explained
-  - repository_evidence_classified
-  - concept_check_completed
-  - personal_github_map_produced
+  - github_concept_introduced
+  - git_concept_introduced
+  - repository_concept_introduced
   - next_workflow_selected
-completion_policy:
-  evidence_required: true
-  ai_self_attestation_allowed: false
-  repository_write_required: false
-  exactly_one_next_workflow: true
-routing:
-  no_repository: AIPUBS-START-002
-  unfamiliar_repository: AIPUBS-START-003
-  learn_git: AIPUBS-GIT-001
-  create_tracked_work: AIPUBS-GITHUB-001
-  make_change: AIPUBS-BUILD-001
-  test_code: AIPUBS-VERIFY-001
-  submit_for_review: AIPUBS-GITHUB-002
-  learn_actions: AIPUBS-VERIFY-002
-  open_source: AIPUBS-START-010
-composition:
-  repository_discovery: OWF-002
-  future_orchestrator: OWF-011
+safety:
+  destructive_operations: false
+  modifies_files: false
+  executes_commands: false
