@@ -35,6 +35,7 @@ def test_actions_and_deployment_are_evidence_based(tmp_path):
     (tmp_path / ".github" / "workflows" / "ci.yml").write_text("name: CI\n", encoding="utf-8")
     (tmp_path / "Dockerfile").write_text("FROM scratch\n", encoding="utf-8")
     result = inspect_primitives(tmp_path)
-    assert result["github_actions"]["status"] == "UNKNOWN" or result["github_actions"]["workflow_files"] == []
+    assert result["github_actions"]["status"] == "OBSERVED FACT"
+    assert result["github_actions"]["workflow_files"] == [".github/workflows/ci.yml"]
     assert result["deployment"]["status"] == "OBSERVED FACT"
     assert result["deployment"]["hints"] == ["Dockerfile"]
