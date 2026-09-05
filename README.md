@@ -1,31 +1,77 @@
-# Open Flow
+# Open Workflow Framework
 
-Open Flow is an open-source workflow ecosystem for repository intelligence, AI-assisted development, learning, verification, and bounded automation.
+Open Workflow Framework (OWF) is a lightweight, Git-native ecosystem of composable workflows for GitHub Copilot CLI and compatible agent environments.
 
-## OWF-002: Repository Explorer
+OWF organizes instructions, agents, skills, workflow manifests, safety policies, and verification into reusable engineering workflows. It is deliberately not a new agent runtime.
 
-OWF-002 is the first evidence-collection workflow. It performs a deterministic, read-only survey of a repository and emits either Markdown for human/LLM context or JSON for downstream workflows.
+## v0.1.0 workflows
 
-### Guarantees
+| ID | Workflow | Purpose |
+|---|---|---|
+| OWF-001 | First Contact | Learn an unfamiliar repository |
+| OWF-002 | Repository Explorer | Collect repository evidence |
+| OWF-003 | Project Doctor | Diagnose project health |
+| OWF-004 | Guided Bug Fix | Reproduce and fix bugs |
+| OWF-005 | Test Builder | Build regression protection |
+| OWF-006 | Security Auditor | Perform evidence-driven security analysis |
+| OWF-007 | Documentation Engineer | Align docs with implementation |
+| OWF-008 | GitHub Maintainer | Turn findings into GitHub work |
+| OWF-009 | Research Lab | Conduct reproducible technical research |
+| OWF-010 | Autonomous Builder | Execute bounded engineering objectives |
 
-- Python 3.8+ standard library only
-- Repository analysis does not modify repository files
-- Common build, dependency, cache, IDE, and VCS directories are excluded
-- Results contain an explicit schema version
-- Filesystem failures are reported rather than silently treated as absence
-- Output is deterministic for a stable filesystem state
+## Architecture
 
-### Usage
-
-From the repository root:
-
-```bash
-PYTHONPATH=src python -m owf002.repo_explorer .
-PYTHONPATH=src python -m owf002.repo_explorer . --format json -o survey.json
-PYTHONPATH=src python -m owf002.repo_explorer /path/to/repo -o survey.md
+```text
+                 OPEN WORKFLOW FRAMEWORK
+                            |
+          +-----------------+-----------------+
+          |                 |                 |
+       Workflows          Agents           Skills
+          |                 |                 |
+          +-----------------+-----------------+
+                            |
+                    Safety + Verification
+                            |
+                         Copilot CLI
+                            |
+                   Git / GitHub / MCP
 ```
 
-### Workflow contract
+A workflow is a versioned composition of reusable actions. Agents provide role-specific reasoning. Skills provide reusable procedures. Copilot CLI supplies the execution environment and native capabilities.
+
+## Operating modes
+
+- `observe` - read/analyze only
+- `plan` - produce a plan without changes
+- `guided` - explain consequential actions and seek confirmation
+- `assisted` - perform bounded authorized work
+- `autonomous` - execute a bounded objective under explicit policy
+
+Autonomous mode does not override repository policy, permissions, or safety gates.
+
+## Core loop
+
+```text
+UNDERSTAND -> PLAN -> EXECUTE -> VERIFY -> EXPLAIN
+```
+
+The framework treats evidence and verification as first-class outputs. An agent must not claim a test passed, a vulnerability exists, or an objective is complete without supporting evidence.
+
+## Repository layout
+
+```text
+.copilot/
+  agents/          reusable role definitions
+  instructions/    repository-wide operating policy
+  skills/          reusable procedures
+workflows/         versioned workflow manifests
+schemas/           machine-readable contracts
+tests/             workflow validation
+```
+
+## OWF-002 foundation
+
+OWF-002 is the first evidence-collection workflow. Its Python collector is deterministic, read-only, dependency-free at runtime, and emits versioned survey data for downstream workflows.
 
 ```text
 Repository
@@ -33,28 +79,37 @@ Repository
    v
 OWF-002 Explorer
    |
-   +--> survey.json  (machine contract)
-   +--> survey.md    (LLM/human context)
+   +--> survey.json
+   +--> survey.md
    |
    v
-OWF-003+ downstream analysis
+OWF-003+ analysis
 ```
 
-OWF-002 reports evidence. It does not claim to understand repository intent, code quality, security posture, or correctness. Those concerns belong to downstream workflows.
+OWF-002 reports what was observed. It does not claim to understand repository intent, correctness, security posture, or code quality.
 
-## Planned workflow family
+## Validation
 
-```text
-OWF-001 Workflow Bootstrap
-OWF-002 Repository Explorer
-OWF-003 Repository Mapper
-OWF-004 Architecture Analyzer
-OWF-005 Execution Analyzer
-OWF-006 Quality Analyzer
-OWF-007 Deployment Analyzer
-OWF-008 Repository Synthesizer
-OWF-009 Learning Journey
-OWF-010 Autonomous Builder
+The test harness validates that all ten workflow manifests exist, contain required fields, use supported modes, and have unique OWF identifiers.
+
+```bash
+python -m pip install pytest pyyaml
+pytest -q
 ```
 
-Each workflow should have a versioned contract, deterministic tests where practical, explicit safety boundaries, and machine-readable outputs.
+## Design goals
+
+- Git-native
+- lightweight
+- open source
+- composable
+- reproducible
+- testable
+- auditable
+- provider-friendly
+- MCP-compatible
+- education-oriented
+
+## Status
+
+OWF `0.1.0` is an experimental starter specification and workflow set. It is not, by itself, a security boundary or autonomous-agent runtime.
