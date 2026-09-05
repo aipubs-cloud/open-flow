@@ -19,11 +19,9 @@ def make_repo(tmp_path: Path) -> Path:
 
 
 def test_collect_is_deterministic_and_ignores_noise(tmp_path):
-    root = make_repo(tmp_path)
-    first = collect(root)
-    second = collect(root)
+    first = collect(make_repo(tmp_path))
+    second = collect(make_repo(tmp_path))
     assert first == second
-    assert all(".git/" not in p for p in [x["path"] for x in []])
     assert ".git" not in [x["name"] for x in first["scan_metadata"]["top_level"]]
     assert first["scan_metadata"]["total_files"] == 5
 
