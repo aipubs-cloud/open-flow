@@ -4,19 +4,23 @@ from pathlib import Path
 import yaml
 from jsonschema import Draft202012Validator
 
+from core.registry import discover_manifests, validate_registry
+
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOWS = ROOT / "workflows"
 SCHEMA = ROOT / "schemas" / "workflow.schema.json"
-REQUIRED = {"id", "name", "version", "purpose", "steps"}
+REQUIRED = {"id", "name", "version", "steps"}
 MODES = {"observe", "plan", "guided", "assisted", "autonomous"}
 
 
 def manifests():
-    return sorted(WORKFLOWS.glob("*/workflow.yaml"))
+    return discover_manifests()
 
 
-def test_ten_workflows_exist():
-    assert len(manifests()) == 10
+def test_workflow_manifests_are_discovered_recursively():
+    paths = manifests()
+    assert paths
+    assert any("AIPUBS-START" in str(path) for path in paths)
+    assert any("011-workflow-composer" in str(path) for path in paths)
 
 
 def test_workflow_manifests_are_valid():
@@ -28,7 +32,6 @@ def test_workflow_manifests_are_valid():
         assert isinstance(data, dict), path
         missing = REQUIRED - data.keys()
         assert not missing, f"{path}: missing {sorted(missing)}"
-        assert data["id"].startswith("OWF-")
         declared_modes = data.get("modes")
         declared_mode = data.get("mode")
         assert (declared_mode is not None) ^ (declared_modes is not None), f"{path}: declare exactly one of mode or modes"
@@ -41,10 +44,8 @@ def test_workflow_manifests_are_valid():
         assert not errors, f"{path}: " + "; ".join(error.message for error in errors)
         ids.append(data["id"])
     assert len(ids) == len(set(ids))
-    assert set(ids) == {f"OWF-{i:03d}" for i in range(1, 11)}
 
 
-def test_manifest_paths_match_directories():
-    for path in manifests():
-        data = yaml.safe_load(path.read_text(encoding="utf-8"))
-        assert data["id"] in path.read_text(encoding="utf-8")
+def test_canonical_registry_is_integrity_clean():
+    errors = validate_registry()
+    assert not errors, "\n".join(str(error) for error in errors)
