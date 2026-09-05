@@ -9,7 +9,7 @@ Every workflow MUST have:
 - `version`: semantic version of the workflow contract
 - `description`: concise purpose
 
-IDs are never silently reused for a different purpose.
+`purpose` may be retained as descriptive metadata for compatibility, but `description` is the normative identity field. IDs are never silently reused for a different purpose.
 
 ## 2. Modes
 
@@ -23,32 +23,37 @@ OWF defines five conceptual operating modes:
 | `assisted` | perform authorized development | bounded |
 | `autonomous` | execute a predefined objective | explicitly bounded |
 
-A workflow must state which modes it supports.
+A workflow MUST declare its supported operating mode(s). The canonical representation is:
+
+- `mode` for a single-mode workflow.
+- `modes` for a multi-mode workflow.
+
+`mode` and `modes` MUST NOT appear together. This prevents contradictory manifests while preserving a compact representation for single-mode workflows.
 
 ## 3. Inputs
 
-Inputs should declare:
+Structured inputs MUST declare:
 
-- name
-- type
-- required/optional status
-- description
-- validation constraints
-- sensitivity classification when relevant
+- `name`
+- `type`
+- `required`
+- `description`
+- optional validation constraints
+- optional sensitivity classification when relevant
 
-Never place secrets directly in manifests or fixtures.
+Simple string inputs remain supported as a compact compatibility form. Never place secrets directly in manifests or fixtures.
 
 ## 4. Outputs
 
-Outputs should declare:
+Structured outputs MUST declare:
 
-- artifact name
-- type or media format
-- schema reference when structured
-- whether the artifact is deterministic
-- verification status
+- `name`
+- `type` or media format
+- optional schema reference when structured
+- optional deterministic flag
+- optional verification status
 
-A workflow result should distinguish `observed`, `derived`, `verified`, and `unknown` information.
+Simple string outputs remain supported as a compact compatibility form. A workflow result should distinguish `observed`, `derived`, `verified`, and `unknown` information.
 
 ## 5. Capabilities
 
@@ -66,7 +71,7 @@ Capabilities should be minimal. A workflow should fail clearly when a required c
 
 ## 6. Safety
 
-Every workflow should define:
+Every workflow should define, directly or through its governing policy:
 
 - default mode
 - destructive-operation policy
