@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "open-flow-owf002"
 version = "0.1.0"
-description = "Deterministic, read-only repository exploration workflow for Open Workflow Framework"
+description = "Deterministic, composable workflow framework for GitHub Copilot CLI and compatible agent environments"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
@@ -19,6 +19,9 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
+dependencies = [
+  "PyYAML>=6,<7",
+]
 
 [project.scripts]
 owf002-explore = "owf002.repo_explorer:main"
@@ -29,11 +32,14 @@ dev = [
   "pyyaml>=6,<7",
   "jsonschema>=4,<5",
 ]
+test = [
+  "pytest>=7,<9",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 addopts = "-ra"
