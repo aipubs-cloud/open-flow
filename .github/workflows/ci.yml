@@ -18,7 +18,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install test dependencies
-        run: python -m pip install pytest pyyaml
-      - name: Validate workflows
-        run: pytest -q
+      - name: Install package and development dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Validate repository tests
+        run: python -m pytest -q
+      - name: Validate workflow manifests
+        run: python tests/validate_workflows.py
