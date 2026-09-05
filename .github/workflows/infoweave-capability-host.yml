@@ -1,0 +1,247 @@
+name: INFOWEAVE GitHub Capability Host
+
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: High-level workload objective
+        required: true
+        type: string
+      operation:
+        description: Requested capability operation
+        required: true
+        default: analyze
+        type: choice
+        options:
+          - analyze
+          - read
+          - propose
+          - create_issue
+          - create_pr
+      target_repository:
+        description: Target repository in owner/name form
+        required: false
+        type: string
+      target_path:
+        description: Optional file or directory path
+        required: false
+        type: string
+      issue_title:
+        description: Issue title when operation is create_issue
+        required: false
+        type: string
+      issue_body:
+        description: Issue body when operation is create_issue
+        required: false
+        type: string
+      pr_head:
+        description: Existing head branch for create_pr
+        required: false
+        type: string
+      pr_base:
+        description: Base branch for create_pr
+        required: false
+        default: main
+        type: string
+      pr_title:
+        description: PR title when operation is create_pr
+        required: false
+        type: string
+      pr_body:
+        description: PR body when operation is create_pr
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: infoweave-github-${{ github.repository }}
+  cancel-in-progress: false
+
+env:
+  INFOWEAVE_PROTOCOL: INFOWEAVE-OMEGA-PLUS-5
+  INFOWEAVE_WORKFLOW: INFOWEAVE-GITHUB-001
+  INFOWEAVE_VERSION: 1.0.0
+
+jobs:
+  receive:
+    name: Receive
+    runs-on: ubuntu-latest
+    outputs:
+      query_id: ${{ steps.receive.outputs.query_id }}
+    steps:
+      - id: receive
+        name: Record workload
+        shell: bash
+        env:
+          QUERY: ${{ inputs.query }}
+        run: |
+          set -euo pipefail
+          query_id="$(python - <<'PY'
+          import uuid
+          print(uuid.uuid4())
+          PY
+          )"
+          echo "query_id=${query_id}" >> "$GITHUB_OUTPUT"
+          {
+            echo "## INFOWEAVE RECEIVE"
+            echo "query_id: ${query_id}"
+            echo "query: ${QUERY}"
+            echo "operation: ${{ inputs.operation }}"
+            echo "target_repository: ${{ inputs.target_repository || github.repository }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  govern:
+    name: Capability Governor
+    needs: receive
+    runs-on: ubuntu-latest
+    outputs:
+      decision: ${{ steps.policy.outputs.decision }}
+      human_review: ${{ steps.policy.outputs.human_review }}
+      capability: ${{ steps.policy.outputs.capability }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: policy
+        name: Evaluate capability policy
+        shell: bash
+        env:
+          OPERATION: ${{ inputs.operation }}
+          TARGET_REPOSITORY: ${{ inputs.target_repository || github.repository }}
+        run: |
+          set -euo pipefail
+          python - "$OPERATION" "$TARGET_REPOSITORY" <<'PY'
+          import pathlib, sys, yaml
+          operation, repository = sys.argv[1:]
+          policy = yaml.safe_load(pathlib.Path("infoweave/policies/capability-governor-v1.yml").read_text())
+          rules = policy["operations"]
+          if operation not in rules:
+              raise SystemExit(f"Denied: unsupported operation {operation!r}")
+          rule = rules[operation]
+          import re
+          if not any(re.fullmatch(pattern, repository) for pattern in policy["repository_allowlist"]):
+              raise SystemExit(f"Denied: repository {repository!r} is outside the allowlist")
+          print(f"decision={rule['decision']}")
+          print(f"human_review={str(rule['human_review_required']).lower()}")
+          print(f"capability={rule['capability']}")
+          with open("$GITHUB_OUTPUT", "a") as out:
+              out.write(f"decision={rule['decision']}\n")
+              out.write(f"human_review={str(rule['human_review_required']).lower()}\n")
+              out.write(f"capability={rule['capability']}\n")
+          PY
+
+  inspect:
+    name: Read / Inspect
+    needs: [receive, govern]
+    if: needs.govern.outputs.decision == 'AUTHORIZED' || needs.govern.outputs.decision == 'AUTHORIZED_WITH_HUMAN_REVIEW'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.target_repository || github.repository }}
+          path: target
+      - name: Collect bounded repository evidence
+        shell: bash
+        env:
+          TARGET_PATH: ${{ inputs.target_path }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${TARGET_PATH}" ]]; then
+            test -e "target/${TARGET_PATH}"
+            if [[ -f "target/${TARGET_PATH}" ]]; then
+              sed -n '1,500p' "target/${TARGET_PATH}"
+            else
+              find "target/${TARGET_PATH}" -maxdepth 2 -type f -print | sort | head -500
+            fi
+          else
+            find target -maxdepth 3 -type f -not -path '*/.git/*' -print | sort | head -500
+          fi
+
+  human_review:
+    name: Human Authorization Gate
+    needs: [receive, govern, inspect]
+    if: needs.govern.outputs.human_review == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: infoweave-human-approval
+    steps:
+      - name: Authorization recorded
+        run: |
+          echo "Human authorization granted for capability: ${{ needs.govern.outputs.capability }}"
+          echo "Workload: ${{ needs.receive.outputs.query_id }}"
+
+  mutate:
+    name: Authorized GitHub Mutation
+    needs: [receive, govern, inspect, human_review]
+    if: |
+      always() &&
+      needs.govern.outputs.decision == 'AUTHORIZED_WITH_HUMAN_REVIEW' &&
+      needs.human_review.result == 'success' &&
+      (inputs.operation == 'create_issue' || inputs.operation == 'create_pr')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create issue
+        if: inputs.operation == 'create_issue'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_REPOSITORY: ${{ inputs.target_repository || github.repository }}
+          TITLE: ${{ inputs.issue_title }}
+          BODY: ${{ inputs.issue_body }}
+        run: |
+          set -euo pipefail
+          test -n "$TITLE"
+          gh issue create --repo "$TARGET_REPOSITORY" --title "$TITLE" --body "${BODY:-Created through INFOWEAVE-GITHUB-001.}"
+      - name: Create pull request
+        if: inputs.operation == 'create_pr'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_REPOSITORY: ${{ inputs.target_repository || github.repository }}
+          HEAD: ${{ inputs.pr_head }}
+          BASE: ${{ inputs.pr_base }}
+          TITLE: ${{ inputs.pr_title }}
+          BODY: ${{ inputs.pr_body }}
+        run: |
+          set -euo pipefail
+          test -n "$HEAD"
+          test -n "$TITLE"
+          gh pr create --repo "$TARGET_REPOSITORY" --head "$HEAD" --base "$BASE" --title "$TITLE" --body "${BODY:-Created through INFOWEAVE-GITHUB-001.}"
+
+  provenance:
+    name: Provenance
+    needs: [receive, govern, inspect, human_review, mutate]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write provenance record
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p provenance
+          cat > "provenance/${{ needs.receive.outputs.query_id }}.json" <<'JSON'
+          {
+            "protocol": "INFOWEAVE-OMEGA-PLUS-5",
+            "workflow": "INFOWEAVE-GITHUB-001",
+            "version": "1.0.0",
+            "query_id": "${{ needs.receive.outputs.query_id }}",
+            "repository": "${{ inputs.target_repository || github.repository }}",
+            "operation": "${{ inputs.operation }}",
+            "actor": "${{ github.actor }}",
+            "run_id": "${{ github.run_id }}",
+            "jobs": {
+              "receive": "${{ needs.receive.result }}",
+              "govern": "${{ needs.govern.result }}",
+              "inspect": "${{ needs.inspect.result }}",
+              "human_review": "${{ needs.human_review.result }}",
+              "mutate": "${{ needs.mutate.result }}"
+            },
+            "recorded_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          JSON
+          cat "provenance/${{ needs.receive.outputs.query_id }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: infoweave-provenance-${{ needs.receive.outputs.query_id }}
+          path: provenance/
