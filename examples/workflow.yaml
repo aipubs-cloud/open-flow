@@ -1,19 +1,13 @@
+id: OWF-011
 name: example-repository-review
 version: 0.1.0
-spec: OWF-EXAMPLE
-id: OWF-EXAMPLE
-description: Demonstrates the minimum explicit contract for a bounded repository review workflow.
+purpose: Demonstrate the minimum explicit contract for a bounded repository review workflow.
+description: Read-only example showing composition, capabilities, safety, and verification.
 
 modes:
   - observe
   - plan
   - guided
-
-defaults:
-  mode: observe
-  require_tests: true
-  require_review: true
-  destructive_operations: false
 
 capabilities:
   filesystem_read: true
@@ -28,6 +22,22 @@ inputs:
     required: true
     description: Repository root to inspect.
 
+steps:
+  - id: discover
+    action: Map repository structure and identify observable project signals.
+    agent: owf-architect
+    skill: repository-discovery
+    requires_confirmation: false
+    verification:
+      - Discovery output contains only observed paths and signals.
+  - id: test-plan
+    action: Identify relevant test infrastructure and verification gaps.
+    agent: owf-tester
+    skill: testing
+    requires_confirmation: false
+    verification:
+      - Test recommendations identify expected behavior and failure meaning.
+
 outputs:
   - name: result
     type: application/json
@@ -35,6 +45,7 @@ outputs:
 
 safety:
   secret_policy: Never read, print, persist, or transmit secret values.
+  destructive_operations: false
   confirmation_required_for:
     - any state-changing operation
   stop_conditions:
@@ -42,14 +53,14 @@ safety:
     - requested operation exceeds declared capabilities
 
 verification:
-  required:
-    - inspect collected evidence
-    - validate result against schemas/result.schema.json
+  - Inspect collected evidence.
+  - Validate structured output against schemas/result.schema.json.
+  - Confirm no undeclared capability was used.
 
-composition:
-  agents:
-    - owf-architect
-    - owf-tester
-  skills:
-    - repository-discovery
-    - testing
+agents:
+  - owf-architect
+  - owf-tester
+
+skills:
+  - repository-discovery
+  - testing
