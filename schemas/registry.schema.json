@@ -38,9 +38,10 @@
     }
   },
   "allOf": [
-    {
-      "if": {"properties": {"defaults": {"required": ["mode"]}}, "required": ["defaults"]},
-      "then": {"properties": {"modes": {"contains": {"const": {"$data": "1/defaults/mode"}}}}}
-    }
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "observe"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "observe"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "plan"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "plan"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "guided"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "guided"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "assisted"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "assisted"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "autonomous"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "autonomous"}}}}}
   ]
 }
