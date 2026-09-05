@@ -1,0 +1,29 @@
+id: AIPUBS-START-003
+name: Explore a Repository
+version: 0.1.0
+category: start
+level: beginner
+mode: observe
+objective: Teach a beginner to understand an unfamiliar repository from evidence rather than assumptions.
+inputs:
+  - repository-target
+outputs:
+  - repository-map
+  - architecture-map
+  - execution-map
+  - learning-summary
+steps:
+  - run_owf_002
+  - inspect_structure
+  - identify_source_and_tests
+  - identify_ci_and_deployment
+  - synthesize_learning_summary
+graduation:
+  - repository_map_created
+  - architecture_map_created
+  - execution_map_created
+  - unknowns_identified
+safety:
+  destructive_operations: false
+  modifies_files: false
+  executes_commands: false

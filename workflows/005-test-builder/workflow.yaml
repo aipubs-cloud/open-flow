@@ -28,5 +28,4 @@ outputs:
   - test-results
 safety:
   modifies_files: true
-  destructive_operations: false
   requires_confirmation_before_modification: true

@@ -1,0 +1,31 @@
+id: AIPUBS-GIT-001
+name: Git Basics
+version: 0.1.0
+category: git
+level: beginner
+mode: guided
+objective: Teach the working tree, staging area, commits, status, diff, and history through a tiny real change.
+inputs:
+  - repository-baseline
+outputs:
+  - git-change
+  - git-history-entry
+steps:
+  - inspect_git_status
+  - make_tiny_change
+  - inspect_git_diff
+  - stage_change
+  - create_commit
+  - inspect_log
+graduation:
+  - status_understood
+  - diff_understood
+  - commit_created
+  - history_inspected
+prerequisites:
+  - AIPUBS-START-002
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  requires_confirmation_before_modification: true

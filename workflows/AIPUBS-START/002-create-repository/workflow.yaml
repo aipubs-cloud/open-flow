@@ -1,0 +1,28 @@
+id: AIPUBS-START-002
+name: Create Your First Repository
+version: 0.1.0
+category: start
+level: beginner
+mode: guided
+objective: Guide a beginner through creating a useful GitHub repository with project documentation and baseline metadata.
+inputs:
+  - project_goal
+outputs:
+  - repository-created
+  - repository-baseline
+steps:
+  - choose_project_name
+  - choose_visibility
+  - create_repository
+  - establish_readme
+  - establish_license
+  - establish_gitignore
+graduation:
+  - repository_exists
+  - readme_present
+  - baseline_metadata_present
+safety:
+  destructive_operations: false
+  force_push: false
+  modifies_files: true
+  requires_confirmation_before_modification: true

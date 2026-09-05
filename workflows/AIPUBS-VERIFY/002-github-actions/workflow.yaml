@@ -1,0 +1,28 @@
+id: AIPUBS-VERIFY-002
+name: Meet GitHub Actions
+version: 0.1.0
+category: verify
+level: beginner
+mode: observe
+objective: Help a beginner discover and understand repository automation using GitHub Actions.
+inputs:
+  - repository-map
+outputs:
+  - ci-map
+  - automation-understanding
+steps:
+  - locate_workflows
+  - inspect_triggers
+  - explain_jobs
+  - inspect_test_build_steps
+  - inspect_recent_results
+  - summarize_automation
+graduation:
+  - workflow_found_or_absence_recorded
+  - trigger_understood
+  - job_flow_understood
+prerequisites:
+  - AIPUBS-START-003
+safety:
+  destructive_operations: false
+  modifies_files: false

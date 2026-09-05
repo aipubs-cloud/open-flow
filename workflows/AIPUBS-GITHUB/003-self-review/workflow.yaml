@@ -1,0 +1,27 @@
+id: AIPUBS-GITHUB-003
+name: Review Your Own Pull Request
+version: 0.1.0
+category: github
+level: beginner
+mode: observe
+objective: Teach self-review by checking requirements, diff, tests, documentation, security, and scope.
+inputs:
+  - pull-request
+  - test-results
+outputs:
+  - self-review
+  - review-readiness
+steps:
+  - read_requirements
+  - inspect_diff
+  - inspect_tests
+  - inspect_documentation
+  - inspect_security
+  - inspect_scope
+  - determine_readiness
+graduation:
+  - review_completed
+  - readiness_decided
+safety:
+  destructive_operations: false
+  modifies_files: false

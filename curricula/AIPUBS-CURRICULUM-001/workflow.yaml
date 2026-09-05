@@ -1,0 +1,46 @@
+id: AIPUBS-CURRICULUM-001
+name: GitHub Beginner Journey
+version: 0.1.0
+type: curriculum
+provider: AIPubs
+objective: Turn real GitHub software-development tasks into guided, executable learning missions.
+entrypoint: AIPUBS-START-001
+missions:
+  - AIPUBS-START-001
+  - AIPUBS-START-002
+  - AIPUBS-START-003
+  - AIPUBS-GIT-001
+  - AIPUBS-GIT-002
+  - AIPUBS-GITHUB-001
+  - AIPUBS-BUILD-001
+  - AIPUBS-VERIFY-001
+  - AIPUBS-GITHUB-002
+  - AIPUBS-GITHUB-003
+  - AIPUBS-GITHUB-004
+  - AIPUBS-GITHUB-005
+  - AIPUBS-VERIFY-002
+  - AIPUBS-RELEASE-001
+  - AIPUBS-DEPLOY-001
+  - AIPUBS-OPERATE-001
+  - AIPUBS-SHIELD-001
+  - AIPUBS-MENTOR-001
+  - AIPUBS-MENTOR-002
+  - AIPUBS-START-010
+progression:
+  model: progressive-autonomy
+  modes: [observe, plan, guided, assisted]
+badges:
+  - FIRST-CONTACT
+  - EXPLORER
+  - GIT-USER
+  - BUILDER
+  - TESTER
+  - REVIEWER
+  - CONTRIBUTOR
+  - SHIPPER
+  - MAINTAINER
+  - ARCHITECT
+  - AUTONOMOUS-OPERATOR
+completion_policy:
+  requires_observable_artifact: true
+  allows_self_attestation: false

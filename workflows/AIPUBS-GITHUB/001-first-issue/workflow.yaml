@@ -1,0 +1,30 @@
+id: AIPUBS-GITHUB-001
+name: Your First Issue
+version: 0.1.0
+category: github
+level: beginner
+mode: guided
+objective: Turn a real idea, bug, or task into a clear GitHub Issue with acceptance criteria.
+inputs:
+  - project-goal
+outputs:
+  - github-issue
+  - acceptance-criteria
+steps:
+  - capture_problem
+  - gather_context
+  - define_expected_behavior
+  - define_acceptance_criteria
+  - create_issue
+  - verify_issue_quality
+graduation:
+  - issue_created
+  - acceptance_criteria_present
+  - scope_is_clear
+prerequisites:
+  - AIPUBS-START-002
+safety:
+  destructive_operations: false
+  modifies_files: false
+  creates_github_issue: true
+  requires_confirmation_before_external_write: true

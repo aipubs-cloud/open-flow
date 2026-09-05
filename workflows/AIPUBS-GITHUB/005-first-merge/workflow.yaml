@@ -1,0 +1,30 @@
+id: AIPUBS-GITHUB-005
+name: Merge Your First Pull Request
+version: 0.1.0
+category: github
+level: beginner
+mode: guided
+objective: Teach the path from pull request approval and checks to safely merging proposed history.
+inputs:
+  - pull-request
+outputs:
+  - merged-change
+  - merge-understanding
+steps:
+  - inspect_checks
+  - inspect_approval
+  - confirm_merge_readiness
+  - merge_pull_request
+  - verify_main
+graduation:
+  - checks_reviewed
+  - merge_completed
+  - main_verified
+prerequisites:
+  - AIPUBS-GITHUB-002
+  - AIPUBS-GITHUB-003
+safety:
+  destructive_operations: false
+  modifies_files: false
+  merges_pull_request: true
+  requires_confirmation_before_external_write: true

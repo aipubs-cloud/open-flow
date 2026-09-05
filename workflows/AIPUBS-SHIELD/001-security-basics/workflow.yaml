@@ -1,0 +1,27 @@
+id: AIPUBS-SHIELD-001
+name: Security 101
+version: 0.1.0
+category: shield
+level: beginner
+mode: observe
+objective: Teach practical repository security hygiene through evidence-driven inspection.
+inputs:
+  - repository-map
+outputs:
+  - security-basics-report
+  - security-hygiene-checklist
+steps:
+  - inspect_secret_risk
+  - inspect_env_files
+  - inspect_dependency_alerts
+  - inspect_actions_permissions
+  - inspect_unsafe_configuration
+  - produce_hygiene_checklist
+graduation:
+  - secret_hygiene_understood
+  - security_checklist_created
+prerequisites:
+  - AIPUBS-START-003
+safety:
+  destructive_operations: false
+  modifies_files: false
