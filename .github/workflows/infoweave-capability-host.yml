@@ -12,12 +12,7 @@ on:
         required: true
         default: analyze
         type: choice
-        options:
-          - analyze
-          - read
-          - propose
-          - create_issue
-          - create_pr
+        options: [analyze, read, propose, create_issue, create_pr]
       target_repository:
         description: Target repository in owner/name form
         required: false
@@ -80,11 +75,7 @@ jobs:
           QUERY: ${{ inputs.query }}
         run: |
           set -euo pipefail
-          query_id="$(python - <<'PY'
-          import uuid
-          print(uuid.uuid4())
-          PY
-          )"
+          query_id="$(python -c 'import uuid; print(uuid.uuid4())')"
           echo "query_id=${query_id}" >> "$GITHUB_OUTPUT"
           {
             echo "## INFOWEAVE RECEIVE"
@@ -112,25 +103,39 @@ jobs:
           TARGET_REPOSITORY: ${{ inputs.target_repository || github.repository }}
         run: |
           set -euo pipefail
-          python - "$OPERATION" "$TARGET_REPOSITORY" <<'PY'
-          import pathlib, sys, yaml
-          operation, repository = sys.argv[1:]
-          policy = yaml.safe_load(pathlib.Path("infoweave/policies/capability-governor-v1.yml").read_text())
-          rules = policy["operations"]
-          if operation not in rules:
-              raise SystemExit(f"Denied: unsupported operation {operation!r}")
-          rule = rules[operation]
-          import re
-          if not any(re.fullmatch(pattern, repository) for pattern in policy["repository_allowlist"]):
-              raise SystemExit(f"Denied: repository {repository!r} is outside the allowlist")
-          print(f"decision={rule['decision']}")
-          print(f"human_review={str(rule['human_review_required']).lower()}")
-          print(f"capability={rule['capability']}")
-          with open("$GITHUB_OUTPUT", "a") as out:
-              out.write(f"decision={rule['decision']}\n")
-              out.write(f"human_review={str(rule['human_review_required']).lower()}\n")
-              out.write(f"capability={rule['capability']}\n")
-          PY
+          ruby - "$OPERATION" "$TARGET_REPOSITORY" <<'RUBY'
+          require "yaml"
+          require "pathname"
+
+          operation, repository = ARGV
+          policy = YAML.safe_load(
+            Pathname("infoweave/policies/capability-governor-v1.yml").read,
+            permitted_classes: [],
+            aliases: false
+          )
+
+          rule = policy.fetch("operations", {})[operation]
+          abort("Denied: unsupported operation #{operation.inspect}") unless rule
+
+          allowed = policy.fetch("repository_allowlist", []).any? do |pattern|
+            Regexp.full_match(pattern, repository)
+          end
+          abort("Denied: repository #{repository.inspect} is outside the allowlist") unless allowed
+
+          decision = rule.fetch("decision")
+          human_review = rule.fetch("human_review_required") ? "true" : "false"
+          capability = rule.fetch("capability")
+
+          File.open(ENV.fetch("GITHUB_OUTPUT"), "a") do |out|
+            out.puts "decision=#{decision}"
+            out.puts "human_review=#{human_review}"
+            out.puts "capability=#{capability}"
+          end
+
+          puts "Capability: #{capability}"
+          puts "Decision: #{decision}"
+          puts "Human review required: #{human_review}"
+          RUBY
 
   inspect:
     name: Read / Inspect
