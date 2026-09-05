@@ -15,7 +15,10 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 import yaml
 
-from .safety import MODE_RANK, SafetyPolicy, resolve_safety
+try:
+    from .safety import MODE_RANK, SafetyPolicy, resolve_safety
+except ImportError:  # pragma: no cover - supports ``python core/composer.py``
+    from safety import MODE_RANK, SafetyPolicy, resolve_safety
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS_DIR = ROOT / "workflows"
@@ -156,10 +159,6 @@ class PipelineComposer:
                 "artifacts_produced": list(workflow.outputs),
                 "safety": effective_safety.to_dict(),
             }
-            if effective_safety.write and not effective_safety.require_confirmation:
-                # The resolver never removes an inherited confirmation gate, but
-                # a write workflow may explicitly opt into no confirmation.
-                pass
             if requires_gate:
                 gate_id = f"G{index}"
                 reason = (
