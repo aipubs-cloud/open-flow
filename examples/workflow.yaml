@@ -1,0 +1,55 @@
+name: example-repository-review
+version: 0.1.0
+spec: OWF-EXAMPLE
+id: OWF-EXAMPLE
+description: Demonstrates the minimum explicit contract for a bounded repository review workflow.
+
+modes:
+  - observe
+  - plan
+  - guided
+
+defaults:
+  mode: observe
+  require_tests: true
+  require_review: true
+  destructive_operations: false
+
+capabilities:
+  filesystem_read: true
+  filesystem_write: false
+  process_execute: false
+  network: false
+  github_write: false
+
+inputs:
+  - name: repository
+    type: path
+    required: true
+    description: Repository root to inspect.
+
+outputs:
+  - name: result
+    type: application/json
+    schema: schemas/result.schema.json
+
+safety:
+  secret_policy: Never read, print, persist, or transmit secret values.
+  confirmation_required_for:
+    - any state-changing operation
+  stop_conditions:
+    - required evidence cannot be collected
+    - requested operation exceeds declared capabilities
+
+verification:
+  required:
+    - inspect collected evidence
+    - validate result against schemas/result.schema.json
+
+composition:
+  agents:
+    - owf-architect
+    - owf-tester
+  skills:
+    - repository-discovery
+    - testing
