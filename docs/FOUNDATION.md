@@ -2,6 +2,8 @@
 
 This document defines what the repository foundation must establish before higher-level workflows are treated as dependable building blocks.
 
+A checked item means the repository contract or implementation is present. It does **not** by itself mean that the current branch has passed CI or independent review.
+
 ## Repository hygiene
 
 - [x] standard ignore rules
@@ -21,7 +23,7 @@ This document defines what the repository foundation must establish before highe
 - [x] verification model
 - [x] host integration boundary
 
-## Contracts
+## Contracts established
 
 - [x] workflow schema
 - [x] workflow registry schema
@@ -30,16 +32,16 @@ This document defines what the repository foundation must establish before highe
 - [x] policy schema
 - [x] hook schema
 - [x] workflow result schema
+- [x] positive and negative contract coverage for public schemas
 
-## Verification
+## Verification evidence
 
-- [x] deterministic repository collector tests
-- [x] canonical workflow fixture
-- [x] result fixture
-- [x] schema validation dependency
-- [x] CI package installation
-- [x] CI test execution
-- [x] CI workflow validation
+- [x] deterministic repository collector tests are present
+- [x] canonical workflow fixture is present
+- [x] result fixture is present
+- [x] schema validation dependency is declared
+- [ ] current PR head has a successful CI run
+- [ ] current PR head has an independently recorded verification result
 
 ## Security baseline
 
@@ -49,9 +51,11 @@ This document defines what the repository foundation must establish before highe
 - [x] autonomous-mode boundaries
 - [x] fail-safe guidance
 - [x] distinction between repository instructions and real host enforcement
+- [x] third-party GitHub Actions are pinned to immutable commit SHAs
+- [x] CI dependency trust model is documented
 
-## Remaining foundation work
+## Deferred hardening
 
-The next hardening pass should address implementation-level concerns identified during review of OWF-002, including edge-case tests, precise depth semantics, formatter coverage, and deeper survey-schema validation.
+The foundation is intentionally not represented as production-complete. Further work may address deeper survey-schema constraints, broader integration coverage, dependency lock/hash enforcement, and implementation-specific edge cases.
 
-The purpose of this checklist is not to claim that OWF is secure or production-complete. It establishes a transparent baseline against which subsequent work can be measured.
+The authoritative status is the combination of this checklist, CI evidence, test results, and review discussion. Unverified claims must remain explicitly marked as such.
