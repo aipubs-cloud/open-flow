@@ -1,0 +1,23 @@
+id: OWF-007
+name: Documentation Engineer
+version: 0.1.0
+purpose: Bring documentation into alignment with observed implementation.
+mode: guided
+steps:
+  - id: inspect
+    action: documentation
+  - id: identify-gaps
+    action: documentation
+  - id: propose
+    action: mentor
+  - id: authorize
+    action: confirmation
+  - id: implement
+    action: documentation
+  - id: validate
+    action: testing
+outputs:
+  - documentation-changes
+  - validation-report
+safety:
+  requires_confirmation_before_modification: true
