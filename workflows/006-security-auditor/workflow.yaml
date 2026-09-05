@@ -1,0 +1,24 @@
+id: OWF-006
+name: Security Auditor
+version: 0.1.0
+purpose: Perform an evidence-driven repository security audit.
+mode: observe
+steps:
+  - id: inventory
+    action: repository-discovery
+  - id: configuration
+    action: security-audit
+  - id: code
+    action: security-audit
+  - id: ci
+    action: security-audit
+  - id: classify
+    action: security-audit
+  - id: remediation
+    action: security-audit
+outputs:
+  - security-report
+  - findings
+  - remediation-plan
+safety:
+  modifies_files: false
