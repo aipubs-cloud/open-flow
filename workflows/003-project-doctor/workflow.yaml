@@ -1,0 +1,24 @@
+id: OWF-003
+name: Project Doctor
+version: 0.1.0
+purpose: Diagnose repository health and generate prioritized improvements.
+mode: observe
+steps:
+  - id: inspect
+    action: repository-discovery
+  - id: health
+    action: project-health
+  - id: testing
+    action: testing
+  - id: security
+    action: security-audit
+  - id: documentation
+    action: documentation
+  - id: prioritize
+    action: mentor
+outputs:
+  - health-report
+  - prioritized-actions
+  - suggested-issues
+safety:
+  modifies_files: false
