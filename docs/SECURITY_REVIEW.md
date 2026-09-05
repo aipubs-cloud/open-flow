@@ -26,9 +26,15 @@ Use this checklist for changes that can affect execution authority, data exposur
 ## CI and supply chain
 
 - [ ] GitHub Actions permissions use least privilege.
-- [ ] Third-party actions are pinned or otherwise governed according to project policy.
+- [ ] Third-party actions are pinned to immutable commit SHAs.
 - [ ] Dependency additions are justified.
 - [ ] Build scripts are reviewed for arbitrary command execution.
+
+### Dependency reproducibility model
+
+For v0.1.0, CI uses the version constraints declared in `pyproject.toml` rather than a generated lockfile. This is an explicit trust-model decision: package resolution is reproducible at the declared compatibility range, but not byte-for-byte reproducible across every future resolver run. The CI action supply chain is separately hardened by pinning third-party actions to immutable SHAs.
+
+A future release may add a lock/hash-controlled environment when the supported Python matrix and packaging workflow justify that additional maintenance burden.
 
 ## Autonomous behavior
 
