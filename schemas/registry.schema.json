@@ -10,9 +10,10 @@
     "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "spec": {"type": "string", "minLength": 1},
     "description": {"type": "string", "minLength": 1},
-    "modes": {"type": "array", "uniqueItems": true, "items": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}},
+    "modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}},
     "defaults": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["mode", "require_tests", "require_review", "destructive_operations"],
       "properties": {
         "mode": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]},
@@ -35,5 +36,11 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"defaults": {"required": ["mode"]}}, "required": ["defaults"]},
+      "then": {"properties": {"modes": {"contains": {"const": {"$data": "1/defaults/mode"}}}}}
+    }
+  ]
 }
