@@ -1,0 +1,43 @@
+id: OWF-010
+name: Autonomous Builder
+version: 0.1.0
+purpose: Execute a bounded engineering objective autonomously with verification and auditability.
+mode: autonomous
+steps:
+  - id: understand-objective
+    action: mentor
+  - id: inspect-repository
+    action: repository-discovery
+  - id: create-plan
+    action: architect
+  - id: identify-risk
+    action: security-audit
+  - id: implement
+    action: mentor
+  - id: test
+    action: testing
+  - id: security-check
+    action: security-audit
+  - id: inspect-diff
+    action: git-diff
+  - id: evaluate
+    action: mentor
+  - id: report
+    action: release-manager
+outputs:
+  - implementation
+  - tests
+  - verification-report
+  - risk-report
+  - completion-report
+gates:
+  - plan-exists
+  - tests-executed
+  - diff-reviewed
+  - security-reviewed
+  - objective-evaluated
+safety:
+  destructive_operations: false
+  force_push: false
+  credential_access: false
+  unrestricted_network: false

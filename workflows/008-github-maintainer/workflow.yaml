@@ -1,0 +1,30 @@
+id: OWF-008
+name: GitHub Maintainer
+version: 0.1.0
+purpose: Turn engineering findings into maintainable GitHub work.
+mode: guided
+steps:
+  - id: inspect
+    action: repository-discovery
+  - id: classify
+    action: mentor
+  - id: prioritize
+    action: mentor
+  - id: issue-plan
+    action: github-issues
+  - id: branch-plan
+    action: git
+  - id: implementation
+    action: mentor
+  - id: test
+    action: testing
+  - id: pull-request
+    action: github-pull-request
+outputs:
+  - issues
+  - branch
+  - pull-request
+  - verification-report
+safety:
+  destructive_operations: false
+  force_push: false

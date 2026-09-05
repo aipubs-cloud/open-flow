@@ -1,0 +1,26 @@
+id: OWF-005
+name: Test Builder
+version: 0.1.0
+purpose: Identify testing gaps and build regression protection.
+mode: guided
+steps:
+  - id: inspect-test-framework
+    action: testing
+  - id: identify-gap
+    action: testing
+  - id: design-test
+    action: tester
+  - id: explain-test
+    action: mentor
+  - id: implement
+    action: tester
+  - id: execute
+    action: testing
+  - id: report
+    action: tester
+outputs:
+  - test-plan
+  - test-changes
+  - test-results
+safety:
+  requires_confirmation_before_modification: true

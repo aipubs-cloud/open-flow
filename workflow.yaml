@@ -1,0 +1,46 @@
+name: open-workflow-framework
+version: 0.1.0
+spec: OWF-001
+description: Composable, safety-aware workflows for GitHub Copilot CLI.
+modes:
+  - observe
+  - plan
+  - guided
+  - assisted
+  - autonomous
+defaults:
+  mode: guided
+  require_tests: true
+  require_review: true
+  destructive_operations: false
+workflows:
+  - id: OWF-001
+    name: first-contact
+    path: workflows/001-first-contact
+  - id: OWF-002
+    name: repository-explorer
+    path: workflows/002-repository-explorer
+  - id: OWF-003
+    name: project-doctor
+    path: workflows/003-project-doctor
+  - id: OWF-004
+    name: guided-bug-fix
+    path: workflows/004-guided-bug-fix
+  - id: OWF-005
+    name: test-builder
+    path: workflows/005-test-builder
+  - id: OWF-006
+    name: security-auditor
+    path: workflows/006-security-auditor
+  - id: OWF-007
+    name: documentation-engineer
+    path: workflows/007-documentation-engineer
+  - id: OWF-008
+    name: github-maintainer
+    path: workflows/008-github-maintainer
+  - id: OWF-009
+    name: research-lab
+    path: workflows/009-research-lab
+  - id: OWF-010
+    name: autonomous-builder
+    path: workflows/010-autonomous-builder

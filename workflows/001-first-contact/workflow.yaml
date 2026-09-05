@@ -1,0 +1,23 @@
+id: OWF-001
+name: First Contact
+version: 0.1.0
+purpose: Introduce a user to an unfamiliar repository.
+mode: guided
+inputs:
+  - repository
+steps:
+  - id: discover
+    action: repository-discovery
+  - id: explain
+    action: mentor
+  - id: identify-next-step
+    action: mentor
+  - id: verify
+    action: repository-discovery
+outputs:
+  - repository-map
+  - architecture-summary
+  - recommended-next-action
+safety:
+  modifies_files: false
+  executes_commands: false

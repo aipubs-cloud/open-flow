@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aipubs-cloud/open-flow/blob/main/schemas/owf-002-survey.schema.json",
+  "title": "OWF-002 Repository Survey",
+  "type": "object",
+  "required": ["schema_version", "scan_metadata", "step_1_discovery", "step_2_architecture", "step_3_execution_path", "step_4_tests", "step_5_ci", "step_6_deployment"],
+  "properties": {
+    "schema_version": {"const": "owf-002.survey.v1"},
+    "scan_metadata": {
+      "type": "object",
+      "required": ["workflow_id", "collector_version", "repository_name", "target_path", "total_files", "extension_counts", "top_level", "errors"],
+      "properties": {
+        "workflow_id": {"const": "OWF-002"},
+        "collector_version": {"type": "string"},
+        "repository_name": {"type": "string"},
+        "target_path": {"type": "string"},
+        "total_files": {"type": "integer", "minimum": 0},
+        "extension_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "top_level": {"type": "array", "items": {"type": "object", "required": ["name", "type"], "properties": {"name": {"type": "string"}, "type": {"enum": ["file", "directory"]}}}},
+        "errors": {"type": "array", "items": {"type": "object", "required": ["path", "operation", "error"], "properties": {"path": {"type": "string"}, "operation": {"type": "string"}, "error": {"type": "string"}}}}
+      }
+    },
+    "step_1_discovery": {"type": "object"},
+    "step_2_architecture": {"type": "object"},
+    "step_3_execution_path": {"type": "object"},
+    "step_4_tests": {"type": "object"},
+    "step_5_ci": {"type": "object"},
+    "step_6_deployment": {"type": "object"}
+  }
+}

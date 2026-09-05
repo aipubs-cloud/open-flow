@@ -1,0 +1,12 @@
+[project]
+name = "open-flow-owf002"
+version = "0.1.0"
+description = "Deterministic, read-only repository exploration workflow for Open Flow"
+requires-python = ">=3.8"
+
+[project.scripts]
+owf002-explore = "owf002.repo_explorer:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

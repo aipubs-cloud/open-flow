@@ -1,0 +1,29 @@
+id: OWF-002
+name: Repository Explorer
+version: 0.1.0
+purpose: Give the user a structured understanding of an unfamiliar repository.
+mode: observe
+inputs:
+  - repository
+steps:
+  - id: discover
+    action: repository-discovery
+  - id: architecture
+    action: repository-architecture
+  - id: execution
+    action: execution-path
+  - id: tests
+    action: test-discovery
+  - id: ci
+    action: ci-discovery
+  - id: deployment
+    action: deployment-discovery
+  - id: explain
+    action: mentor
+outputs:
+  - repository-map
+  - architecture-map
+  - execution-map
+  - learning-summary
+safety:
+  modifies_files: false
