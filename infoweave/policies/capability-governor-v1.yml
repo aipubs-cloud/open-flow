@@ -1,0 +1,38 @@
+version: 1.0.0
+protocol: INFOWEAVE-OMEGA-PLUS-5
+workflow: INFOWEAVE-GITHUB-001
+
+# Repository names are matched against these regular expressions.
+# Keep this allowlist narrow in production deployments.
+repository_allowlist:
+  - '^aipubs-cloud/open-flow$'
+
+operations:
+  analyze:
+    capability: mcp:github:repository:observe
+    decision: AUTHORIZED
+    human_review_required: false
+  read:
+    capability: mcp:github:file:read
+    decision: AUTHORIZED
+    human_review_required: false
+  propose:
+    capability: mcp:github:change:propose
+    decision: AUTHORIZED_WITH_HUMAN_REVIEW
+    human_review_required: true
+  create_issue:
+    capability: mcp:github:issue:create
+    decision: AUTHORIZED_WITH_HUMAN_REVIEW
+    human_review_required: true
+  create_pr:
+    capability: mcp:github:pull_request:create
+    decision: AUTHORIZED_WITH_HUMAN_REVIEW
+    human_review_required: true
+
+invariants:
+  - AI agents never receive GitHub credentials.
+  - Read capabilities must not mutate repository state.
+  - Mutation capabilities require explicit human authorization.
+  - Repository access is constrained by the allowlist.
+  - Provenance is emitted for every workload execution.
+  - Workflow defaults remain compatible with OWF guided mode.
