@@ -43,6 +43,8 @@ A checked item means the repository contract or implementation is present. It do
 - [ ] current PR head has a successful CI run
 - [ ] current PR head has an independently recorded verification result
 
+The latest observed CI failures were treated as actionable defects: the malformed workflow schema and stale regression expectations were corrected, and the latest-main AIPUBS-START files were synchronized into the branch. A new CI run must establish the final verification result for the current head.
+
 ## Security baseline
 
 - [x] least-capability guidance
