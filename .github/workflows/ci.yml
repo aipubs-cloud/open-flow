@@ -22,5 +22,5 @@ jobs:
         run: python -m pip install -e '.[dev]'
       - name: Validate repository tests
         run: python -m pytest -q
-      - name: Validate workflow manifests
-        run: python tests/validate_workflows.py
+      - name: Validate workflow manifests and canonical registry
+        run: python tests/validate_workflows.py && python -m core.registry
