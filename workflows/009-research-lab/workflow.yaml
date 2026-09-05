@@ -1,0 +1,34 @@
+id: OWF-009
+name: Research Lab
+version: 0.1.0
+purpose: Transform a technical question into a reproducible research workflow.
+mode: guided
+steps:
+  - id: question
+    action: researcher
+  - id: hypothesis
+    action: researcher
+  - id: evidence
+    action: repository-discovery
+  - id: experiment
+    action: researcher
+  - id: implement
+    action: researcher
+  - id: execute
+    action: researcher
+  - id: analyze
+    action: researcher
+  - id: document
+    action: documentation
+  - id: reproduce
+    action: researcher
+outputs:
+  - research-question
+  - hypothesis
+  - methodology
+  - experiment
+  - results
+  - limitations
+  - reproduction-guide
+safety:
+  destructive_operations: false
