@@ -43,9 +43,6 @@ class SafetyPolicy:
         mode = str(value.get("mode", "observe"))
         if mode not in MODE_RANK:
             raise SafetyResolutionError(f"unsupported mode: {mode!r}")
-
-        # Missing authority is intentionally restrictive. A capability must be
-        # explicitly named before composition can retain it.
         return cls(
             mode=mode,
             write=bool(value.get("write", False)),
@@ -93,11 +90,11 @@ def _as_scope(value: Any) -> frozenset[str]:
 
 
 def _intersect_scopes(values: list[frozenset[str]]) -> frozenset[str]:
-    non_empty = [value for value in values if value]
-    if not non_empty:
+    """Intersect every explicit scope. Empty means no retained authority."""
+    if not values:
         return frozenset()
-    result = set(non_empty[0])
-    for value in non_empty[1:]:
+    result = set(values[0])
+    for value in values[1:]:
         result.intersection_update(value)
     return frozenset(result)
 
@@ -106,8 +103,8 @@ def resolve_safety(*policies: SafetyPolicy | Mapping[str, Any] | None) -> Safety
     """Resolve policies using the most restrictive safe combination.
 
     Boolean authority fields use logical AND. Restrictions such as required
-    confirmation, dry-run, and evidence requirements use logical OR. Scopes
-    and capabilities are intersected when multiple explicit scopes exist.
+    confirmation, dry-run, and evidence requirements use logical OR. Explicit
+    scopes and capabilities are intersected, so authority can only shrink.
     """
     normalized = [
         policy if isinstance(policy, SafetyPolicy) else SafetyPolicy.from_mapping(policy)
@@ -138,20 +135,14 @@ def resolve_safety(*policies: SafetyPolicy | Mapping[str, Any] | None) -> Safety
 def capability_status(policy: SafetyPolicy, requested: Iterable[str]) -> str:
     """Return ``allowed`` only when every requested capability is retained."""
     requested_set = {str(item) for item in requested}
-    if requested_set <= policy.capabilities:
-        return "allowed"
-    return "capability_unavailable"
+    return "allowed" if requested_set <= policy.capabilities else "capability_unavailable"
 
 
 def assert_non_escalating(child: SafetyPolicy, effective: SafetyPolicy) -> None:
     """Raise if an effective policy broadens any inherited restriction."""
     if MODE_RANK[effective.mode] > MODE_RANK[child.mode]:
         raise SafetyResolutionError("effective mode escalates beyond child policy")
-    if child.write and not effective.write:
-        return
-    if not child.write and effective.write:
-        raise SafetyResolutionError("write authority escalated")
-    for name in ("destructive", "force_push", "delete_operations", "secret_exposure", "credential_requests", "network"):
+    for name in ("write", "destructive", "force_push", "delete_operations", "secret_exposure", "credential_requests", "network"):
         if getattr(effective, name) and not getattr(child, name):
             raise SafetyResolutionError(f"{name} authority escalated")
     if child.require_confirmation and not effective.require_confirmation:
@@ -160,3 +151,9 @@ def assert_non_escalating(child: SafetyPolicy, effective: SafetyPolicy) -> None:
         raise SafetyResolutionError("dry-run restriction removed")
     if child.evidence_required and not effective.evidence_required:
         raise SafetyResolutionError("evidence requirement removed")
+    if not effective.filesystem_scope <= child.filesystem_scope:
+        raise SafetyResolutionError("filesystem scope escalated")
+    if not effective.repository_scope <= child.repository_scope:
+        raise SafetyResolutionError("repository scope escalated")
+    if not effective.capabilities <= child.capabilities:
+        raise SafetyResolutionError("capability authority escalated")
