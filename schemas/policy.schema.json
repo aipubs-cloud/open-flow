@@ -1,26 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/aipubs-cloud/open-flow/blob/main/schemas/policy.schema.json",
+  "$id": "https://aipubs-cloud.github.io/open-flow/schemas/policy.schema.json",
   "title": "OWF Safety Policy",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "default_mode", "allowed_modes", "capabilities", "destructive_operations", "secret_policy"],
   "properties": {
-    "version": {"type": "string"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "default_mode": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]},
-    "allowed_modes": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}
-    },
-    "capabilities": {
-      "type": "object",
-      "additionalProperties": {"type": "boolean"}
-    },
+    "allowed_modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}},
+    "capabilities": {"type": "object", "additionalProperties": {"type": "boolean"}},
     "destructive_operations": {"type": "boolean"},
     "require_confirmation_for": {"type": "array", "items": {"type": "string"}},
     "stop_conditions": {"type": "array", "items": {"type": "string"}},
     "secret_policy": {"type": "string", "minLength": 1}
-  }
+  },
+  "allOf": [
+    {"if": {"properties": {"default_mode": {"const": "observe"}}}, "then": {"properties": {"allowed_modes": {"contains": {"const": "observe"}}}}},
+    {"if": {"properties": {"default_mode": {"const": "plan"}}}, "then": {"properties": {"allowed_modes": {"contains": {"const": "plan"}}}}},
+    {"if": {"properties": {"default_mode": {"const": "guided"}}}, "then": {"properties": {"allowed_modes": {"contains": {"const": "guided"}}}}},
+    {"if": {"properties": {"default_mode": {"const": "assisted"}}}, "then": {"properties": {"allowed_modes": {"contains": {"const": "assisted"}}}}},
+    {"if": {"properties": {"default_mode": {"const": "autonomous"}}}, "then": {"properties": {"allowed_modes": {"contains": {"const": "autonomous"}}}}}
+  ]
 }
