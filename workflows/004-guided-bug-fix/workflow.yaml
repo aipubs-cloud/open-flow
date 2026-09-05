@@ -1,0 +1,32 @@
+id: OWF-004
+name: Guided Bug Fix
+version: 0.1.0
+purpose: Teach and execute a reproducible bug-fixing workflow.
+mode: guided
+steps:
+  - id: reproduce
+    action: debugger
+  - id: explain
+    action: mentor
+  - id: isolate
+    action: debugger
+  - id: plan
+    action: mentor
+  - id: authorize
+    action: confirmation
+  - id: patch
+    action: debugger
+  - id: test
+    action: testing
+  - id: diff
+    action: git-diff
+  - id: report
+    action: mentor
+outputs:
+  - diagnosis
+  - patch
+  - tests
+  - verification-report
+safety:
+  requires_confirmation_before_modification: true
+  destructive_operations: false
