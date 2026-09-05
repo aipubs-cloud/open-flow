@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aipubs-cloud/open-flow/blob/main/schemas/hook.schema.json",
+  "title": "OWF Hook",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "event", "purpose", "failure_policy", "side_effects"],
+  "properties": {
+    "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "event": {"enum": ["pre-command", "post-command", "safety", "telemetry"]},
+    "purpose": {"type": "string", "minLength": 1},
+    "version": {"type": "string"},
+    "failure_policy": {"enum": ["fail-closed", "fail-open", "report-only"]},
+    "side_effects": {"type": "boolean"},
+    "required_capabilities": {"type": "array", "items": {"type": "string"}},
+    "data_policy": {"type": "string"}
+  }
+}
