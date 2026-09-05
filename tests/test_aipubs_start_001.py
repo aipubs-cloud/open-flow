@@ -20,10 +20,7 @@ def test_fixture_git_repository(tmp_path):
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
     (tmp_path / "README.md").write_text("# fixture\n", encoding="utf-8")
     subprocess.run(["git", "add", "README.md"], cwd=tmp_path, check=True, capture_output=True)
-    subprocess.run(
-        ["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "initial"],
-        cwd=tmp_path, check=True, capture_output=True,
-    )
+    subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "initial"], cwd=tmp_path, check=True, capture_output=True)
     result = inspect_primitives(tmp_path)
     assert result["repository"]["is_git_repository"] is True
     assert result["branch"]["status"] == "OBSERVED FACT"

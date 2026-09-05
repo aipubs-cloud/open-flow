@@ -1,0 +1,33 @@
+version: 0.1.0
+default_mode: guided
+allowed_modes:
+  - observe
+  - plan
+  - guided
+  - assisted
+
+capabilities:
+  filesystem_read: true
+  filesystem_write: true
+  process_execute: true
+  network: false
+  github_read: true
+  github_write: false
+
+destructive_operations: false
+
+require_confirmation_for:
+  - deleting files
+  - changing permissions
+  - pushing commits
+  - creating deployments
+  - modifying remote GitHub state
+
+stop_conditions:
+  - capability is not declared
+  - action violates repository policy
+  - required evidence is unavailable
+  - verification fails
+  - secret exposure is detected
+
+secret_policy: Secrets must remain in host-managed secret stores or environment variables and must never be emitted into workflow artifacts.

@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 
-def git(root: Path, *args: str) -> str | None:
+def git(root: Path, *args: str):
     try:
         result = subprocess.run(
             ["git", *args], cwd=root, text=True, capture_output=True, check=False
@@ -29,28 +29,26 @@ def inspect_primitives(root: Path) -> dict:
         "tests": {"status": "UNKNOWN", "hints": []},
         "deployment": {"status": "UNKNOWN", "hints": []},
     }
-    if not is_git:
-        return evidence
 
-    remote = git(root, "config", "--get", "remote.origin.url")
-    if remote:
-        evidence["remote_github"] = {
-            "status": "OBSERVED FACT",
-            "url": remote,
-            "is_github": "github.com" in remote.lower(),
-        }
-    branch = git(root, "branch", "--show-current")
-    if branch:
-        evidence["branch"] = {"status": "OBSERVED FACT", "current_branch": branch}
-    latest = git(root, "log", "-1", "--format=%h - %s")
-    if latest:
-        evidence["history"] = {"status": "OBSERVED FACT", "latest_commit": latest}
+    if is_git:
+        remote = git(root, "config", "--get", "remote.origin.url")
+        if remote:
+            evidence["remote_github"] = {
+                "status": "OBSERVED FACT",
+                "url": remote,
+                "is_github": "github.com" in remote.lower(),
+            }
+        branch = git(root, "branch", "--show-current")
+        if branch:
+            evidence["branch"] = {"status": "OBSERVED FACT", "current_branch": branch}
+        latest = git(root, "log", "-1", "--format=%h - %s")
+        if latest:
+            evidence["history"] = {"status": "OBSERVED FACT", "latest_commit": latest}
 
-    actions = sorted(str(p.relative_to(root)) for p in (root / ".github" / "workflows").glob("*.y*ml")) if (root / ".github" / "workflows").exists() else []
+    actions_dir = root / ".github" / "workflows"
+    actions = sorted(str(p.relative_to(root)) for p in actions_dir.glob("*.y*ml")) if actions_dir.exists() else []
     if actions:
         evidence["github_actions"] = {"status": "OBSERVED FACT", "workflow_files": actions}
-    else:
-        evidence["github_actions"] = {"status": "UNKNOWN", "workflow_files": []}
 
     test_names = {"tests", "test", "spec", "__tests__"}
     test_hints = sorted(p.name for p in root.iterdir() if p.is_dir() and p.name.lower() in test_names)

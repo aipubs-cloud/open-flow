@@ -11,7 +11,7 @@ def test_artifact_binding_from_repository_explorer_to_project_doctor(composer):
     result = composer.compose(["OWF-002", "OWF-003"], max_mode="observe")
     assert {b["artifact"] for b in result["bindings"]} == {"repository-map", "architecture-map"}
     assert all(b["from"].startswith("S1.") for b in result["bindings"])
-    assert result["external_inputs"] == []
+    assert result["external_inputs"] == ["S1.repository"]
 
 
 def test_artifact_binding_reaches_security_auditor(composer):

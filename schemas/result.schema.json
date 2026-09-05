@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aipubs-cloud/open-flow/blob/main/schemas/result.schema.json",
+  "title": "OWF Workflow Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["workflow_id", "workflow_version", "status", "mode", "evidence", "verification"],
+  "properties": {
+    "workflow_id": {"type": "string"},
+    "workflow_version": {"type": "string"},
+    "status": {"enum": ["success", "partial", "blocked", "failed", "unverified"]},
+    "mode": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]},
+    "started_at": {"type": "string"},
+    "completed_at": {"type": "string"},
+    "summary": {"type": "string"},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "statement"],
+        "properties": {
+          "kind": {"enum": ["FACT", "INFERENCE", "HYPOTHESIS", "UNKNOWN"]},
+          "statement": {"type": "string"},
+          "source": {"type": "string"},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "checks"],
+      "properties": {
+        "performed": {"type": "boolean"},
+        "checks": {"type": "array", "items": {"type": "string"}},
+        "failures": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "artifacts": {"type": "array", "items": {"type": "string"}},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,66 @@
+id: OWF-011
+name: example-repository-review
+version: 0.1.0
+purpose: Demonstrate the minimum explicit contract for a bounded repository review workflow.
+description: Read-only example showing composition, capabilities, safety, and verification.
+
+modes:
+  - observe
+  - plan
+  - guided
+
+capabilities:
+  filesystem_read: true
+  filesystem_write: false
+  process_execute: false
+  network: false
+  github_write: false
+
+inputs:
+  - name: repository
+    type: path
+    required: true
+    description: Repository root to inspect.
+
+steps:
+  - id: discover
+    action: Map repository structure and identify observable project signals.
+    agent: owf-architect
+    skill: repository-discovery
+    requires_confirmation: false
+    verification:
+      - Discovery output contains only observed paths and signals.
+  - id: test-plan
+    action: Identify relevant test infrastructure and verification gaps.
+    agent: owf-tester
+    skill: testing
+    requires_confirmation: false
+    verification:
+      - Test recommendations identify expected behavior and failure meaning.
+
+outputs:
+  - name: result
+    type: application/json
+    schema: schemas/result.schema.json
+
+safety:
+  secret_policy: Never read, print, persist, or transmit secret values.
+  destructive_operations: false
+  confirmation_required_for:
+    - any state-changing operation
+  stop_conditions:
+    - required evidence cannot be collected
+    - requested operation exceeds declared capabilities
+
+verification:
+  - Inspect collected evidence.
+  - Validate structured output against schemas/result.schema.json.
+  - Confirm no undeclared capability was used.
+
+agents:
+  - owf-architect
+  - owf-tester
+
+skills:
+  - repository-discovery
+  - testing

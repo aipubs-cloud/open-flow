@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aipubs-cloud.github.io/open-flow/schemas/registry.schema.json",
+  "title": "OWF Workflow Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "version", "spec", "description", "modes", "defaults", "workflows"],
+  "properties": {
+    "name": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "spec": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}},
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "require_tests", "require_review", "destructive_operations"],
+      "properties": {
+        "mode": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]},
+        "require_tests": {"type": "boolean"},
+        "require_review": {"type": "boolean"},
+        "destructive_operations": {"type": "boolean"}
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "path"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^OWF-[0-9]{3}$"},
+          "name": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "observe"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "observe"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "plan"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "plan"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "guided"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "guided"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "assisted"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "assisted"}}}}},
+    {"if": {"properties": {"defaults": {"properties": {"mode": {"const": "autonomous"}}}}}, "then": {"properties": {"modes": {"contains": {"const": "autonomous"}}}}}
+  ]
+}

@@ -3,102 +3,47 @@
   "$id": "https://aipubs-cloud.github.io/open-flow/schemas/workflow.schema.json",
   "title": "Open Workflow Framework Workflow",
   "type": "object",
+  "additionalProperties": false,
   "required": ["id", "name", "version"],
   "properties": {
     "id": {"type": "string", "pattern": "^(OWF-[0-9]{3}|AIPUBS-[A-Z0-9]+-[0-9]{3})$"},
     "name": {"type": "string", "minLength": 1},
     "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
     "purpose": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
     "objective": {"type": "string", "minLength": 1},
     "type": {"type": "string", "enum": ["atomic", "composite", "curriculum"], "default": "atomic"},
     "category": {"type": "string"},
     "level": {"type": "string"},
     "provider": {"type": "string"},
     "mode": {"type": "string", "enum": ["observe", "plan", "guided", "assisted", "autonomous"]},
-    "inputs": {
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {"type": "string"},
-          {"type": "object", "minProperties": 1, "maxProperties": 1}
-        ]
-      }
-    },
-    "outputs": {"type": "array", "items": {"type": "string"}},
-    "steps": {"type": "array", "minItems": 1},
+    "modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}},
+    "inputs": {"type": "array", "items": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "object", "additionalProperties": false, "required": ["name", "type", "required", "description"], "properties": {"name": {"type": "string", "minLength": 1}, "type": {"type": "string", "minLength": 1}, "required": {"type": "boolean"}, "description": {"type": "string", "minLength": 1}, "validation": {"type": "object"}, "sensitivity": {"type": "string", "enum": ["public", "internal", "sensitive", "secret"]}}}]}},
+    "outputs": {"type": "array", "items": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "object", "additionalProperties": false, "required": ["name", "type"], "properties": {"name": {"type": "string", "minLength": 1}, "type": {"type": "string", "minLength": 1}, "schema": {"type": "string", "minLength": 1}, "deterministic": {"type": "boolean"}, "verification_status": {"enum": ["verified", "unverified", "unknown"]}}}]}},
+    "capabilities": {"type": "object", "additionalProperties": {"type": "boolean"}},
+    "steps": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["id", "action"], "properties": {"id": {"type": "string", "minLength": 1}, "action": {"type": "string", "minLength": 1}, "agent": {"type": "string"}, "skill": {"type": "string"}, "requires_confirmation": {"type": "boolean"}, "verification": {"type": "array", "items": {"type": "string"}}}}},
+    "pipeline": {"type": "array", "items": {"type": "object", "required": ["step", "workflow"], "properties": {"step": {"type": "integer", "minimum": 1}, "workflow": {"type": "string", "pattern": "^OWF-[0-9]{3}$"}, "name": {"type": "string"}, "mode": {"enum": ["observe", "plan", "guided", "assisted", "autonomous"]}, "with": {"type": "object"}, "artifacts_produced": {"type": "array", "items": {"type": "string"}}, "gate": {"$ref": "#/$defs/gate"}}, "additionalProperties": true}},
+    "bindings": {"type": "array", "items": {"type": "object", "required": ["from", "to", "artifact"], "properties": {"from": {"type": "string", "minLength": 1}, "to": {"type": "string", "minLength": 1}, "artifact": {"type": "string", "minLength": 1}}, "additionalProperties": false}},
+    "gates": {"type": "array", "items": {"oneOf": [{"type": "string", "minLength": 1}, {"$ref": "#/$defs/gate"}]}},
+    "safety": {"type": "object", "additionalProperties": true},
+    "verification": {"type": "array", "items": {"type": "string"}},
+    "agents": {"type": "array", "items": {"type": "string"}},
+    "skills": {"type": "array", "items": {"type": "string"}},
     "prerequisites": {"type": "array", "items": {"type": "string"}},
     "graduation": {"type": "array", "items": {"type": "string"}},
     "missions": {"type": "array", "items": {"type": "string"}},
     "progression": {"type": "object", "additionalProperties": true},
     "badges": {"type": "array", "items": {"type": "string"}},
     "completion_policy": {"type": "object", "additionalProperties": true},
-    "pipeline": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["step", "workflow"],
-        "properties": {
-          "step": {"type": "integer", "minimum": 1},
-          "workflow": {"type": "string", "pattern": "^OWF-[0-9]{3}$"},
-          "name": {"type": "string"},
-          "mode": {"type": "string", "enum": ["observe", "plan", "guided", "assisted", "autonomous"]},
-          "with": {"type": "object"},
-          "artifacts_produced": {"type": "array", "items": {"type": "string"}},
-          "gate": {"$ref": "#/$defs/gate"}
-        },
-        "additionalProperties": true
-      }
-    },
-    "bindings": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["from", "to", "artifact"],
-        "properties": {
-          "from": {"type": "string"},
-          "to": {"type": "string"},
-          "artifact": {"type": "string"}
-        },
-        "additionalProperties": false
-      }
-    },
-    "gates": {"type": "array", "items": {"$ref": "#/$defs/gate"}},
-    "safety": {"type": "object", "additionalProperties": true},
     "mermaid": {"type": "string"},
     "copilot_plan": {"type": "string"}
   },
-  "anyOf": [
-    {"required": ["purpose"]},
-    {"required": ["objective"]}
-  ],
+  "anyOf": [{"required": ["description"]}, {"required": ["purpose"]}],
+  "oneOf": [{"required": ["mode"], "not": {"required": ["modes"]}}, {"required": ["modes"], "not": {"required": ["mode"]}}],
   "allOf": [
-    {
-      "if": {"properties": {"type": {"const": "composite"}}, "required": ["type"]},
-      "then": {"required": ["pipeline", "bindings", "gates"]}
-    },
-    {
-      "if": {"properties": {"type": {"const": "atomic"}}, "required": ["type"]},
-      "then": {"required": ["steps"]}
-    },
-    {
-      "if": {"properties": {"type": {"const": "curriculum"}}, "required": ["type"]},
-      "then": {"required": ["missions"]}
-    }
+    {"if": {"properties": {"type": {"const": "composite"}}, "required": ["type"]}, "then": {"required": ["pipeline", "bindings", "gates"]}},
+    {"if": {"properties": {"type": {"const": "atomic"}}, "required": ["type"]}, "then": {"required": ["steps"]}},
+    {"if": {"properties": {"type": {"const": "curriculum"}}, "required": ["type"]}, "then": {"required": ["missions"]}}
   ],
-  "$defs": {
-    "gate": {
-      "type": "object",
-      "required": ["type", "before_step"],
-      "properties": {
-        "id": {"type": "string"},
-        "type": {"type": "string", "enum": ["manual_approval", "automated_test", "diff_inspection"]},
-        "before_step": {"type": "integer", "minimum": 1},
-        "reason": {"type": "string"},
-        "prompt": {"type": "string"},
-        "approval_env": {"type": "string"}
-      },
-      "additionalProperties": true
-    }
-  },
-  "additionalProperties": true
+  "$defs": {"gate": {"type": "object", "required": ["type", "before_step"], "properties": {"id": {"type": "string"}, "type": {"enum": ["manual_approval", "automated_test", "diff_inspection"]}, "before_step": {"type": "integer", "minimum": 1}, "reason": {"type": "string"}, "prompt": {"type": "string"}, "approval_env": {"type": "string"}}, "additionalProperties": true}}
 }
