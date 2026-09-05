@@ -3,6 +3,10 @@ name: Test Builder
 version: 0.1.0
 purpose: Identify testing gaps and build regression protection.
 mode: guided
+inputs:
+  - findings
+  - remediation-plan
+  - prioritized-actions
 steps:
   - id: inspect-test-framework
     action: testing
@@ -23,4 +27,5 @@ outputs:
   - test-changes
   - test-results
 safety:
+  modifies_files: true
   requires_confirmation_before_modification: true

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "disableAllHooks": false,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "matcher": "create|edit|bash|powershell",
+        "bash": "./hooks/pre-step-gate.sh",
+        "powershell": "pwsh -NoProfile -File ./hooks/pre-step-gate.ps1",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

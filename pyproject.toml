@@ -1,12 +1,21 @@
 [project]
 name = "open-flow-owf002"
 version = "0.1.0"
-description = "Deterministic, read-only repository exploration workflow for Open Flow"
+description = "Deterministic, composable workflow framework for GitHub Copilot CLI and compatible agent environments"
 requires-python = ">=3.8"
+dependencies = [
+  "PyYAML>=6.0",
+]
 
 [project.scripts]
 owf002-explore = "owf002.repo_explorer:main"
+owf-compose = "core.composer:main"
+
+[project.optional-dependencies]
+test = [
+  "pytest>=7.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]

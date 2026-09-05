@@ -3,6 +3,11 @@ name: GitHub Maintainer
 version: 0.1.0
 purpose: Turn engineering findings into maintainable GitHub work.
 mode: guided
+inputs:
+  - findings
+  - remediation-plan
+  - test-changes
+  - test-results
 steps:
   - id: inspect
     action: repository-discovery
@@ -26,5 +31,7 @@ outputs:
   - pull-request
   - verification-report
 safety:
+  modifies_files: true
   destructive_operations: false
   force_push: false
+  requires_confirmation_before_modification: true

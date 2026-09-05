@@ -1,0 +1,32 @@
+id: OWF-011
+name: Workflow Composer
+version: 0.1.0
+purpose: >
+  Translate high-level user intentions into deterministic, safety-gated
+  directed acyclic graphs of existing OWF workflows.
+type: composite
+mode: plan
+inputs:
+  - user_intent
+  - max_mode
+steps:
+  - id: parse-intent
+    action: composer
+    description: Deconstruct the prompt into lifecycle objectives.
+  - id: resolve-dependencies
+    action: composer
+    description: Map objectives to workflows and resolve artifact bindings.
+  - id: synthesize-safety-gates
+    action: composer
+    description: Insert mandatory approval gates for privilege escalation.
+  - id: emit-execution-graph
+    action: composer
+    description: Emit the composite manifest and Copilot CLI execution plan.
+outputs:
+  - composite-manifest
+  - pipeline-dag
+  - verification-plan
+safety:
+  modifies_files: false
+  executes_commands: false
+  requires_confirmation_before_modification: true

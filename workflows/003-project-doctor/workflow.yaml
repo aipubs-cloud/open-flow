@@ -3,6 +3,9 @@ name: Project Doctor
 version: 0.1.0
 purpose: Diagnose repository health and generate prioritized improvements.
 mode: observe
+inputs:
+  - repository-map
+  - architecture-map
 steps:
   - id: inspect
     action: repository-discovery
