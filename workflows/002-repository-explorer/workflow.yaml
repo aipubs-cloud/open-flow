@@ -1,29 +1,102 @@
 id: OWF-002
 name: Repository Explorer
-version: 0.1.0
-purpose: Give the user a structured understanding of an unfamiliar repository.
+version: 0.1.1
+category: EXPLORER
+alias: AIPUBS-EXPLORER-001
+level: intermediate
 mode: observe
+spec: OWF-001
+license: MIT
+provider: aipubs
+framework: OWF
+
+purpose: >
+  Deterministically inspect and map an unfamiliar codebase, collecting
+  verifiable evidence across layout, architecture, execution paths, tests,
+  CI/CD, and deployment without modifying repository files.
+
+safety:
+  modifies_files: false
+  destructive_operations: false
+  force_push: false
+  delete_operations: false
+  network_access: false
+  credential_requests: false
+  require_confirmation_for_write: false
+
 inputs:
-  - repository
+  repository_path:
+    type: path
+    default: "."
+    description: "Root path of the repository to explore."
+  max_depth:
+    type: integer
+    default: 5
+    description: "Maximum traversal depth for file discovery."
+  format:
+    type: string
+    enum: [markdown, json]
+    default: markdown
+    description: "Output formatting for terminal or pipeline consumption."
+
 steps:
-  - id: discover
-    action: repository-discovery
-  - id: architecture
-    action: repository-architecture
-  - id: execution
-    action: execution-path
-  - id: tests
-    action: test-discovery
-  - id: ci
-    action: ci-discovery
-  - id: deployment
-    action: deployment-discovery
-  - id: explain
-    action: mentor
+  - id: step-1-discover
+    name: Discover Repository
+    action: scan_filesystem
+    description: "Catalog directory structure, language distribution, manifests, and documentation."
+    produces: raw_discovery
+
+  - id: step-2-architecture
+    name: Identify Architecture
+    action: classify_topology
+    description: "Detect monorepo/polyrepo workspaces, layered structures, and component boundaries."
+    produces: architecture_facts
+
+  - id: step-3-execution-path
+    name: Identify Execution Path
+    action: trace_entrypoints
+    description: "Locate entrypoint candidates and manifest scripts without executing application code."
+    produces: execution_paths
+
+  - id: step-4-tests
+    name: Identify Tests
+    action: detect_test_suites
+    description: "Locate test suites, categorize test types, and extract test configuration evidence."
+    produces: test_inventory
+
+  - id: step-5-ci
+    name: Identify CI
+    action: inspect_pipelines
+    description: "Catalog automated workflows across GitHub Actions, GitLab CI, CircleCI, and Jenkins/Azure Pipelines."
+    produces: ci_inventory
+
+  - id: step-6-deployment
+    name: Identify Deployment
+    action: inspect_infrastructure
+    description: "Discover Docker, Compose, Kubernetes, Helm, Terraform, PaaS manifests, and environment templates."
+    produces: deployment_inventory
+
+  - id: step-7-explain-findings
+    name: Explain Findings
+    action: synthesize_deliverables
+    description: "Compile observed facts into repository-map, architecture-map, execution-map, and learning-summary."
+
 outputs:
   - repository-map
   - architecture-map
   - execution-map
   - learning-summary
-safety:
-  modifies_files: false
+  - raw-telemetry
+
+completion_policy:
+  evidence_required: true
+  ai_self_attestation_allowed: false
+  repository_write_required: false
+  deterministic_collection_required: true
+
+composition:
+  unlocks:
+    - OWF-003
+    - OWF-005
+    - OWF-006
+    - OWF-008
