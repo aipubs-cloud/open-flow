@@ -1,0 +1,40 @@
+{
+  "workflow_id": "OWF-002",
+  "workflow_version": "0.1.0",
+  "status": "success",
+  "mode": "observe",
+  "summary": "Repository survey completed without modifying repository contents.",
+  "evidence": [
+    {
+      "kind": "FACT",
+      "statement": "The repository contains a Python package under src/owf002.",
+      "source": "filesystem observation",
+      "confidence": 1.0
+    },
+    {
+      "kind": "INFERENCE",
+      "statement": "The repository uses a src-centric Python package layout.",
+      "source": "observed directory structure",
+      "confidence": 0.95
+    },
+    {
+      "kind": "UNKNOWN",
+      "statement": "Repository security posture is not established by the survey alone.",
+      "source": "workflow boundary",
+      "confidence": 1.0
+    }
+  ],
+  "verification": {
+    "performed": true,
+    "checks": [
+      "Collector completed successfully.",
+      "Output structure was inspected.",
+      "No repository mutation was requested by OWF-002."
+    ],
+    "failures": []
+  },
+  "artifacts": ["survey.json", "survey.md"],
+  "limitations": [
+    "The survey reports repository signals; it does not establish correctness, security, intent, or code quality."
+  ]
+}
