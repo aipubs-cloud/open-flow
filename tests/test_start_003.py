@@ -110,3 +110,10 @@ def test_result_requires_explicit_unknowns_and_one_next_workflow():
         "next_workflow": {"id": "AIPUBS-DOES-NOT-EXIST", "reason": "Unknown route."},
     }
     assert not validate("start-003-result.schema.json", syntactically_valid_but_unknown_route)
+
+
+def test_selected_next_workflow_is_registered():
+    registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+    registered_ids = {item["id"] for item in registry["workflows"]}
+    selected = "AIPUBS-GIT-001"
+    assert selected in registered_ids
