@@ -77,6 +77,24 @@ def test_invalid_version(tmp_path):
     assert any(error.code == "METADATA_DRIFT" for error in errors)
 
 
+def test_invalid_status(tmp_path):
+    write_manifest(tmp_path, "OWF-001")
+    entry = base_entry()
+    entry["status"] = "preview"
+    registry = write_registry(tmp_path, [entry])
+    errors = validate_registry(registry, tmp_path / "workflows")
+    assert any(error.code == "INVALID_STATUS" for error in errors)
+
+
+def test_invalid_path(tmp_path):
+    write_manifest(tmp_path, "OWF-001")
+    entry = base_entry()
+    entry["path"] = "/tmp/workflow.yaml"
+    registry = write_registry(tmp_path, [entry])
+    errors = validate_registry(registry, tmp_path / "workflows")
+    assert any(error.code == "INVALID_PATH" for error in errors)
+
+
 def test_retired_reference_requires_explicit_exception(tmp_path):
     write_manifest(tmp_path, "OWF-001")
     data = yaml.safe_load((tmp_path / "workflows/OWF-001/workflow.yaml").read_text())

@@ -23,7 +23,7 @@ workflows:
   - {id: OWF-010, name: Autonomous Builder, path: workflows/010-autonomous-builder/workflow.yaml, version: 0.1.0, category: core, status: active}
   - {id: OWF-011, name: Workflow Composer, path: workflows/011-workflow-composer/workflow.yaml, version: 0.1.0, category: core, status: active}
 
-  - {id: AIPUBS-START-001, name: What Is GitHub?, path: workflows/AIPUBS-START/001-what-is-github/workflow.yaml, version: 0.1.1, category: start, status: active}
+  - {id: AIPUBS-START-001, name: "What Is GitHub?", path: workflows/AIPUBS-START/001-what-is-github/workflow.yaml, version: 0.1.1, category: start, status: active}
   - {id: AIPUBS-START-002, name: Create Your First Repository, path: workflows/AIPUBS-START/002-create-repository/workflow.yaml, version: 0.1.1, category: start, status: active}
   - {id: AIPUBS-START-003, name: Explore a Repository, path: workflows/AIPUBS-START/003-explore-repository/workflow.yaml, version: 0.1.0, category: start, status: active}
   - {id: AIPUBS-START-010, name: Complete Your First Open-Source Contribution, path: workflows/AIPUBS-START/010-first-open-source-contribution/workflow.yaml, version: 0.1.0, category: start, status: active}
@@ -35,11 +35,11 @@ workflows:
   - {id: AIPUBS-GITHUB-004, name: Respond to Review Feedback, path: workflows/AIPUBS-GITHUB/004-review-feedback/workflow.yaml, version: 0.1.0, category: github, status: active}
   - {id: AIPUBS-GITHUB-005, name: Merge Your First Pull Request, path: workflows/AIPUBS-GITHUB/005-first-merge/workflow.yaml, version: 0.1.0, category: github, status: active}
   - {id: AIPUBS-BUILD-001, name: Build Your First Change, path: workflows/AIPUBS-BUILD/001-first-change/workflow.yaml, version: 0.1.0, category: build, status: active}
-  - {id: AIPUBS-VERIFY-001, name: Does My Code Actually Work?, path: workflows/AIPUBS-VERIFY/001-first-test/workflow.yaml, version: 0.1.0, category: verify, status: active}
+  - {id: AIPUBS-VERIFY-001, name: "Does My Code Actually Work?", path: workflows/AIPUBS-VERIFY/001-first-test/workflow.yaml, version: 0.1.0, category: verify, status: active}
   - {id: AIPUBS-VERIFY-002, name: Meet GitHub Actions, path: workflows/AIPUBS-VERIFY/002-github-actions/workflow.yaml, version: 0.1.0, category: verify, status: active}
   - {id: AIPUBS-RELEASE-001, name: Ship Your First Release, path: workflows/AIPUBS-RELEASE/001-first-release/workflow.yaml, version: 0.1.0, category: release, status: active}
   - {id: AIPUBS-DEPLOY-001, name: Deploy Your First Website, path: workflows/AIPUBS-DEPLOY/001-first-deployment/workflow.yaml, version: 0.1.0, category: deploy, status: active}
-  - {id: AIPUBS-OPERATE-001, name: What Happens After Deployment?, path: workflows/AIPUBS-OPERATE/001-software-maintenance/workflow.yaml, version: 0.1.0, category: operate, status: active}
+  - {id: AIPUBS-OPERATE-001, name: "What Happens After Deployment?", path: workflows/AIPUBS-OPERATE/001-software-maintenance/workflow.yaml, version: 0.1.0, category: operate, status: active}
   - {id: AIPUBS-SHIELD-001, name: Security 101, path: workflows/AIPUBS-SHIELD/001-security-basics/workflow.yaml, version: 0.1.0, category: shield, status: active}
   - {id: AIPUBS-MENTOR-001, name: Ask AI to Explain Your Code, path: workflows/AIPUBS-MENTOR/001-explain-my-code/workflow.yaml, version: 0.1.0, category: mentor, status: active}
   - {id: AIPUBS-MENTOR-002, name: Teach Me While I Code, path: workflows/AIPUBS-MENTOR/002-teach-me-while-i-code/workflow.yaml, version: 0.1.0, category: mentor, status: active}

@@ -69,6 +69,21 @@ def _references(value: Any) -> Iterable[str]:
                 yield from _references(item)
 
 
+def _entry_manifest_path(relative_path: Any, repo_root: Path, workflow_root: Path) -> Path | None:
+    if not isinstance(relative_path, str) or not relative_path:
+        return None
+    candidate = Path(relative_path)
+    if candidate.is_absolute():
+        return None
+    manifest_path = (repo_root / candidate).resolve(strict=False)
+    workflow_root_path = workflow_root.resolve(strict=False)
+    try:
+        manifest_path.relative_to(workflow_root_path)
+    except ValueError:
+        return None
+    return manifest_path
+
+
 def validate_registry(
     registry_path: Path = REGISTRY_PATH,
     workflow_root: Path = WORKFLOW_ROOT,
@@ -91,6 +106,16 @@ def validate_registry(
         if not isinstance(workflow_id, str) or not WORKFLOW_ID.fullmatch(workflow_id):
             errors.append(RegistryError("INVALID_ID", f"entry {index} has invalid id {workflow_id!r}"))
             continue
+        version = entry.get("version")
+        if not isinstance(version, str) or not SEMVER.fullmatch(version):
+            errors.append(RegistryError("INVALID_VERSION", f"{workflow_id}: {version!r}"))
+        status = entry.get("status")
+        if status not in STATUSES:
+            errors.append(RegistryError("INVALID_STATUS", f"{workflow_id}: {status!r}"))
+        relative_path = entry.get("path")
+        manifest_path = _entry_manifest_path(relative_path, repo_root, workflow_root)
+        if manifest_path is None:
+            errors.append(RegistryError("INVALID_PATH", f"{workflow_id}: {relative_path!r}"))
         if workflow_id in registry_by_id:
             errors.append(RegistryError("DUPLICATE_REGISTRY_ID", workflow_id))
         registry_by_id[workflow_id] = entry
@@ -111,7 +136,9 @@ def validate_registry(
 
     for workflow_id, entry in registry_by_id.items():
         relative_path = entry.get("path")
-        path = repo_root / str(relative_path or "")
+        path = _entry_manifest_path(relative_path, repo_root, workflow_root)
+        if path is None:
+            continue
         if not path.is_file():
             errors.append(RegistryError("MISSING_MANIFEST", f"{workflow_id}: {relative_path}"))
             continue
