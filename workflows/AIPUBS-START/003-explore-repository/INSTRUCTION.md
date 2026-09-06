@@ -23,6 +23,21 @@ Use **OWF-002 Repository Explorer** as the deterministic evidence collector. Do 
 
 The learner-facing layer interprets that evidence. It must never upgrade a collector hint into proof.
 
+## Local invocation
+For a local repository, the deterministic collector can be inspected directly without executing application code:
+
+```bash
+python workflows/002-repository-explorer/collector.py <repository-path> --format json
+```
+
+For durable markdown artifacts, direct output to a dedicated directory outside the target repository:
+
+```bash
+python workflows/002-repository-explorer/collector.py <repository-path> --output-dir <artifact-directory>
+```
+
+The second command writes only to the explicitly supplied artifact directory. Never use the target repository as the artifact directory when preserving the observe-only invariant.
+
 ## Interaction loop
 1. Ask what the learner wants to understand.
 2. Establish the repository target.
