@@ -1,29 +1,130 @@
 id: AIPUBS-START-003
-name: Explore a Repository
+name: Explore Your First Repository
 version: 0.1.0
-category: start
+category: START
 level: beginner
 mode: observe
-objective: Teach a beginner to understand an unfamiliar repository from evidence rather than assumptions.
+objective: Teach a beginner to understand an unfamiliar repository from deterministic evidence while preserving uncertainty.
+purpose: Provide an interactive learner-facing synthesis over the OWF-002 repository evidence collector.
+type: atomic
+provider: aipubs
 inputs:
-  - repository-target
+  - name: repository_target
+    type: path
+    required: true
+    description: Local repository path to inspect.
+    sensitivity: public
+  - name: learner_goal
+    type: string
+    required: false
+    description: What the learner wants to understand about the repository.
+    sensitivity: public
 outputs:
-  - repository-map
-  - architecture-map
-  - execution-map
-  - learning-summary
+  - name: repository-map
+    type: artifact
+    schema: schemas/repository-map.schema.json
+    deterministic: true
+    verification_status: verified
+  - name: architecture-map
+    type: artifact
+    schema: schemas/architecture-map.schema.json
+    deterministic: true
+    verification_status: verified
+  - name: execution-map
+    type: artifact
+    schema: schemas/execution-map.schema.json
+    deterministic: true
+    verification_status: verified
+  - name: learning-summary
+    type: artifact
+    schema: schemas/learning-summary.schema.json
+    deterministic: true
+    verification_status: verified
+  - name: workflow-result
+    type: result
+    schema: schemas/start-003-result.schema.json
+    deterministic: true
+    verification_status: verified
+capabilities:
+  filesystem_read: true
+  filesystem_write: false
+  network: false
+  application_execution: false
 steps:
-  - run_owf_002
-  - inspect_structure
-  - identify_source_and_tests
-  - identify_ci_and_deployment
-  - synthesize_learning_summary
+  - id: collect
+    action: Run the deterministic OWF-002 repository evidence collector in read-only mode.
+    skill: repository-discovery
+    verification:
+      - Collector completes without modifying the target repository.
+      - Structured evidence is available for discovery, architecture, execution, tests, CI, and deployment.
+  - id: orient
+    action: Ask the learner what they want to understand before presenting repository evidence.
+    verification:
+      - Learner goal is captured or marked unknown.
+  - id: classify
+    action: Classify learner-facing claims as observed, inferred, or unknown.
+    verification:
+      - Unsupported claims are not presented as facts.
+  - id: synthesize
+    action: Produce the repository, architecture, execution, and learning artifacts from collected evidence.
+    verification:
+      - Candidate entry points remain candidates.
+      - Test presence is not represented as test success.
+      - Deployment configuration is not represented as active deployment.
+  - id: check
+    action: Ask concise comprehension questions about repository structure and evidence versus inference.
+    verification:
+      - Understanding status is represented in the workflow result.
+  - id: route
+    action: Select exactly one next workflow using learner intent and established repository evidence.
+    verification:
+      - The selected workflow is represented by a machine-readable ID.
+      - Unsupported prerequisites do not become implicit facts.
 graduation:
+  - repository_target_established
+  - owf_002_evidence_collected_or_blocked_structured
   - repository_map_created
   - architecture_map_created
   - execution_map_created
-  - unknowns_identified
+  - learning_summary_created
+  - evidence_states_preserved
+  - comprehension_checked
+  - exactly_one_next_workflow_selected
 safety:
   destructive_operations: false
   modifies_files: false
+  modifies_remote: false
+  write_operations: false
   executes_commands: false
+  executes_application_code: false
+  installs_dependencies: false
+  network_access: false
+  credential_requests: false
+  secret_exposure: false
+  require_confirmation_for_write: true
+  resource_scope: target_repository_read_only
+verification:
+  - Validate manifest against schemas/workflow.schema.json.
+  - Validate all referenced artifact schemas exist.
+  - Validate OWF-002 composition reference against the canonical registry.
+  - Run deterministic START-003 tests.
+prerequisites:
+  - OWF-002
+  - AIPUBS-START-001
+  - AIPUBS-START-002
+skills:
+  - repository-discovery
+completion_policy:
+  mode: evidence_and_understanding
+  no_repository_write_required: true
+  unknowns_must_remain_explicit: true
+mermaid: |
+  flowchart TD
+    A[Orient learner] --> B[OWF-002 evidence]
+    B --> C[Classify evidence]
+    C --> D[Repository map]
+    D --> E[Architecture map]
+    E --> F[Execution map]
+    F --> G[Learning summary]
+    G --> H[Comprehension check]
+    H --> I[One next workflow]
