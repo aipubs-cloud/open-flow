@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict, List
 
 import yaml
 
@@ -21,7 +22,7 @@ def write_manifest(root: Path, workflow_id: str = "OWF-001", version: str = "0.1
     )
 
 
-def write_registry(root: Path, entries: list[dict]) -> Path:
+def write_registry(root: Path, entries: List[Dict]) -> Path:
     path = root / "registry.yaml"
     path.write_text(yaml.safe_dump({"workflows": entries}), encoding="utf-8")
     return path
