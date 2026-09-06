@@ -7,6 +7,7 @@ from jsonschema import Draft202012Validator
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
 MANIFEST = ROOT / "workflows/AIPUBS-START/003-explore-repository/workflow.yaml"
+REGISTRY = ROOT / "registry/workflows.yaml"
 
 
 def load_schema(name):
@@ -17,12 +18,22 @@ def validate(name, instance):
     return list(Draft202012Validator(load_schema(name)).iter_errors(instance))
 
 
-def test_start_003_manifest_matches_current_workflow_contract():
+def test_start_003_manifest_matches_current_workflow_contract_and_registry():
     manifest = yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))
+    registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
     assert not validate("workflow.schema.json", manifest)
     assert manifest["id"] == "AIPUBS-START-003"
+    assert manifest["name"] == "Explore a Repository"
+    assert manifest["category"] == "start"
     assert manifest["mode"] == "observe"
     assert manifest["type"] == "atomic"
+
+    entry = next(item for item in registry["workflows"] if item["id"] == manifest["id"])
+    assert entry["path"] == "workflows/AIPUBS-START/003-explore-repository/workflow.yaml"
+    assert entry["version"] == manifest["version"]
+    assert entry["name"] == manifest["name"]
+    assert entry["category"] == manifest["category"]
+    assert entry["status"] == "active"
 
 
 def test_start_003_artifact_schemas_are_valid():
@@ -36,7 +47,7 @@ def test_start_003_artifact_schemas_are_valid():
         Draft202012Validator.check_schema(load_schema(name))
 
 
-def test_execution_artifact_preserves_candidate_status():
+def test_sparse_execution_evidence_preserves_candidate_and_unknown_status():
     valid = {
         "schema_version": "owf.execution-map.v1",
         "candidate_entry_points": [{"path": "src/main.py", "basis": "entrypoint naming pattern"}],
@@ -45,8 +56,11 @@ def test_execution_artifact_preserves_candidate_status():
     }
     assert not validate("execution-map.schema.json", valid)
 
+    invalid = {k: v for k, v in valid.items() if k != "runtime_unknowns"}
+    assert validate("execution-map.schema.json", invalid)
 
-def test_learning_summary_requires_a_single_next_workflow():
+
+def test_incomplete_learning_summary_requires_a_route():
     valid = {
         "schema_version": "owf.learning-summary.v1",
         "learner_understands": ["repository structure"],
@@ -58,8 +72,10 @@ def test_learning_summary_requires_a_single_next_workflow():
         },
     }
     assert not validate("learning-summary.schema.json", valid)
-    invalid = {**valid, "recommended_next_workflow": []}
-    assert validate("learning-summary.schema.json", invalid)
+    missing_route = {k: v for k, v in valid.items() if k != "recommended_next_workflow"}
+    assert validate("learning-summary.schema.json", missing_route)
+    invalid_route = {**valid, "recommended_next_workflow": []}
+    assert validate("learning-summary.schema.json", invalid_route)
 
 
 def test_result_requires_explicit_unknowns_and_one_next_workflow():
@@ -73,3 +89,24 @@ def test_result_requires_explicit_unknowns_and_one_next_workflow():
         "next_workflow": {"id": "AIPUBS-GIT-001", "reason": "Git fundamentals requested."},
     }
     assert not validate("start-003-result.schema.json", valid)
+
+    missing_unknowns = {
+        **valid,
+        "evidence": {"observed": [], "inferred": []},
+    }
+    assert validate("start-003-result.schema.json", missing_unknowns)
+
+    multiple_routes = {
+        **valid,
+        "next_workflow": [
+            {"id": "AIPUBS-GIT-001", "reason": "Git fundamentals requested."},
+            {"id": "AIPUBS-VERIFY-001", "reason": "Testing requested."},
+        ],
+    }
+    assert validate("start-003-result.schema.json", multiple_routes)
+
+    syntactically_valid_but_unknown_route = {
+        **valid,
+        "next_workflow": {"id": "AIPUBS-DOES-NOT-EXIST", "reason": "Unknown route."},
+    }
+    assert not validate("start-003-result.schema.json", syntactically_valid_but_unknown_route)
