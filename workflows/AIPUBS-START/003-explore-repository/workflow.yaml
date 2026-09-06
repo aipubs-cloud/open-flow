@@ -1,7 +1,7 @@
 id: AIPUBS-START-003
-name: Explore Your First Repository
+name: Explore a Repository
 version: 0.1.0
-category: START
+category: start
 level: beginner
 mode: observe
 objective: Teach a beginner to understand an unfamiliar repository from deterministic evidence while preserving uncertainty.
@@ -106,7 +106,7 @@ safety:
 verification:
   - Validate manifest against schemas/workflow.schema.json.
   - Validate all referenced artifact schemas exist.
-  - Validate OWF-002 composition reference against the canonical registry.
+  - Validate OWF-002 prerequisite against the canonical registry.
   - Run deterministic START-003 tests.
 prerequisites:
   - OWF-002
