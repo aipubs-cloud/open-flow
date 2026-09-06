@@ -1,34 +1,58 @@
-"""Canonical workflow registry validation and discovery."""
+"""Canonical workflow registry validation and filesystem discovery."""
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
 from pathlib import Path
 import re
 from typing import Any, Iterable
 
 import yaml
+from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "registry" / "workflows.yaml"
+REGISTRY_SCHEMA_PATH = ROOT / "schemas" / "registry.schema.json"
 WORKFLOW_ROOT = ROOT / "workflows"
 SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$")
 WORKFLOW_ID = re.compile(r"^(?:OWF-[0-9]{3}|AIPUBS-[A-Z0-9]+-[0-9]{3})$")
 STATUSES = {"experimental", "active", "deprecated", "retired"}
 
+
 @dataclass(frozen=True)
 class RegistryError:
     code: str
     message: str
+
     def __str__(self) -> str:
         return f"{self.code}: {self.message}"
 
+
 def discover_manifests(root: Path = WORKFLOW_ROOT) -> list[Path]:
-    """Discover manifests from the filesystem, never from an inventory list."""
-    return sorted(root.rglob("workflow.yaml"))
+    """Discover workflow manifests recursively from the configured filesystem root."""
+    if not root.is_dir():
+        return []
+    return sorted(path for path in root.rglob("workflow.yaml") if path.is_file())
+
 
 def _load_yaml(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text(encoding="utf-8"))
     return value if isinstance(value, dict) else {}
+
+
+def load_registry(registry_path: Path = REGISTRY_PATH) -> dict[str, Any]:
+    """Load the canonical registry document without applying semantic checks."""
+    return _load_yaml(registry_path)
+
+
+def _schema_errors(registry: dict[str, Any]) -> list[RegistryError]:
+    schema = json.loads(REGISTRY_SCHEMA_PATH.read_text(encoding="utf-8"))
+    validator = Draft202012Validator(schema)
+    return [
+        RegistryError("REGISTRY_SCHEMA", error.message)
+        for error in sorted(validator.iter_errors(registry), key=lambda item: list(item.path))
+    ]
+
 
 def _references(value: Any) -> Iterable[str]:
     if isinstance(value, str):
@@ -44,13 +68,34 @@ def _references(value: Any) -> Iterable[str]:
             elif isinstance(item, (dict, list)):
                 yield from _references(item)
 
-def validate_registry(registry_path: Path = REGISTRY_PATH, workflow_root: Path = WORKFLOW_ROOT) -> list[RegistryError]:
+
+def _entry_manifest_path(relative_path: Any, repo_root: Path, workflow_root: Path) -> Path | None:
+    if not isinstance(relative_path, str) or not relative_path:
+        return None
+    candidate = Path(relative_path)
+    if candidate.is_absolute():
+        return None
+    manifest_path = (repo_root / candidate).resolve(strict=False)
+    workflow_root_path = workflow_root.resolve(strict=False)
+    try:
+        manifest_path.relative_to(workflow_root_path)
+    except ValueError:
+        return None
+    return manifest_path
+
+
+def validate_registry(
+    registry_path: Path = REGISTRY_PATH,
+    workflow_root: Path = WORKFLOW_ROOT,
+) -> list[RegistryError]:
+    """Validate schema, inventory integrity, filesystem discovery, and references."""
     errors: list[RegistryError] = []
     repo_root = workflow_root.parent
-    registry = _load_yaml(registry_path)
+    registry = load_registry(registry_path)
+    errors.extend(_schema_errors(registry))
     entries = registry.get("workflows", [])
     if not isinstance(entries, list):
-        return [RegistryError("REGISTRY_FORMAT", "workflows must be a list")]
+        return errors + [RegistryError("REGISTRY_FORMAT", "workflows must be a list")]
 
     registry_by_id: dict[str, dict[str, Any]] = {}
     for index, entry in enumerate(entries):
@@ -61,15 +106,19 @@ def validate_registry(registry_path: Path = REGISTRY_PATH, workflow_root: Path =
         if not isinstance(workflow_id, str) or not WORKFLOW_ID.fullmatch(workflow_id):
             errors.append(RegistryError("INVALID_ID", f"entry {index} has invalid id {workflow_id!r}"))
             continue
+        version = entry.get("version")
+        if not isinstance(version, str) or not SEMVER.fullmatch(version):
+            errors.append(RegistryError("INVALID_VERSION", f"{workflow_id}: {version!r}"))
+        status = entry.get("status")
+        if status not in STATUSES:
+            errors.append(RegistryError("INVALID_STATUS", f"{workflow_id}: {status!r}"))
+        relative_path = entry.get("path")
+        manifest_path = _entry_manifest_path(relative_path, repo_root, workflow_root)
+        if manifest_path is None:
+            errors.append(RegistryError("INVALID_PATH", f"{workflow_id}: {relative_path!r}"))
         if workflow_id in registry_by_id:
             errors.append(RegistryError("DUPLICATE_REGISTRY_ID", workflow_id))
         registry_by_id[workflow_id] = entry
-        if not SEMVER.fullmatch(str(entry.get("version", ""))):
-            errors.append(RegistryError("INVALID_VERSION", f"{workflow_id}: {entry.get('version')!r}"))
-        if entry.get("status") not in STATUSES:
-            errors.append(RegistryError("INVALID_STATUS", f"{workflow_id}: {entry.get('status')!r}"))
-        if not isinstance(entry.get("path"), str):
-            errors.append(RegistryError("INVALID_PATH", f"{workflow_id}: missing path"))
 
     manifests = discover_manifests(workflow_root)
     manifest_by_id: dict[str, tuple[Path, dict[str, Any]]] = {}
@@ -86,17 +135,20 @@ def validate_registry(registry_path: Path = REGISTRY_PATH, workflow_root: Path =
             errors.append(RegistryError("INVALID_MANIFEST_ID", f"{path}: {workflow_id}"))
 
     for workflow_id, entry in registry_by_id.items():
-        path = repo_root / str(entry.get("path", ""))
+        relative_path = entry.get("path")
+        path = _entry_manifest_path(relative_path, repo_root, workflow_root)
+        if path is None:
+            continue
         if not path.is_file():
-            errors.append(RegistryError("MISSING_MANIFEST", f"{workflow_id}: {entry.get('path')}"))
+            errors.append(RegistryError("MISSING_MANIFEST", f"{workflow_id}: {relative_path}"))
             continue
         if workflow_id not in manifest_by_id:
             errors.append(RegistryError("REGISTRY_ORPHAN", workflow_id))
             continue
         manifest_path, manifest = manifest_by_id[workflow_id]
         canonical_path = manifest_path.relative_to(repo_root).as_posix()
-        if entry.get("path") != canonical_path:
-            errors.append(RegistryError("PATH_DRIFT", f"{workflow_id}: registry={entry.get('path')} manifest={canonical_path}"))
+        if relative_path != canonical_path:
+            errors.append(RegistryError("PATH_DRIFT", f"{workflow_id}: registry={relative_path} manifest={canonical_path}"))
         for field in ("name", "version"):
             if entry.get(field) != manifest.get(field):
                 errors.append(RegistryError("METADATA_DRIFT", f"{workflow_id}: {field} registry={entry.get(field)!r} manifest={manifest.get(field)!r}"))
@@ -109,7 +161,7 @@ def validate_registry(registry_path: Path = REGISTRY_PATH, workflow_root: Path =
             errors.append(RegistryError("MANIFEST_ORPHAN", workflow_id))
 
     known = set(registry_by_id)
-    retired = {k for k, v in registry_by_id.items() if v.get("status") == "retired"}
+    retired = {workflow_id for workflow_id, entry in registry_by_id.items() if entry.get("status") == "retired"}
     for workflow_id, (_, manifest) in manifest_by_id.items():
         for reference in sorted(set(_references(manifest))):
             if reference not in known:
@@ -118,6 +170,7 @@ def validate_registry(registry_path: Path = REGISTRY_PATH, workflow_root: Path =
                 errors.append(RegistryError("RETIRED_REFERENCE", f"{workflow_id} -> {reference}"))
     return errors
 
+
 def main() -> int:
     errors = validate_registry()
     if errors:
@@ -125,8 +178,9 @@ def main() -> int:
             print(error)
         print(f"registry validation failed: {len(errors)} error(s)")
         return 1
-    print(f"registry validation passed: {len(discover_manifests())} manifests registered")
+    print(f"registry validation passed: {len(discover_manifests())} manifests discovered and registered")
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

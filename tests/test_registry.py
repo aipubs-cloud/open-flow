@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict, List
 
 import yaml
 
@@ -21,7 +22,7 @@ def write_manifest(root: Path, workflow_id: str = "OWF-001", version: str = "0.1
     )
 
 
-def write_registry(root: Path, entries: list[dict]) -> Path:
+def write_registry(root: Path, entries: List[Dict]) -> Path:
     path = root / "registry.yaml"
     path.write_text(yaml.safe_dump({"workflows": entries}), encoding="utf-8")
     return path
@@ -75,6 +76,24 @@ def test_invalid_version(tmp_path):
     errors = validate_registry(registry, tmp_path / "workflows")
     assert any(error.code == "INVALID_VERSION" for error in errors)
     assert any(error.code == "METADATA_DRIFT" for error in errors)
+
+
+def test_invalid_status(tmp_path):
+    write_manifest(tmp_path, "OWF-001")
+    entry = base_entry()
+    entry["status"] = "preview"
+    registry = write_registry(tmp_path, [entry])
+    errors = validate_registry(registry, tmp_path / "workflows")
+    assert any(error.code == "INVALID_STATUS" for error in errors)
+
+
+def test_invalid_path(tmp_path):
+    write_manifest(tmp_path, "OWF-001")
+    entry = base_entry()
+    entry["path"] = "/tmp/workflow.yaml"
+    registry = write_registry(tmp_path, [entry])
+    errors = validate_registry(registry, tmp_path / "workflows")
+    assert any(error.code == "INVALID_PATH" for error in errors)
 
 
 def test_retired_reference_requires_explicit_exception(tmp_path):
